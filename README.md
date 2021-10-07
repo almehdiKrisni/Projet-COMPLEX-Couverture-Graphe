@@ -1,1 +1,3 @@
-# Projet_TME_COMPLEX
+## Projet TME COMPLEX - Couverture de graphe
+
+Langage de programmation : Python
