@@ -1,5 +1,43 @@
+
+
+
+#                                   PROJET COMPLEX 2021 GROUPE 3
+#                                       COUVERTURE DE GRAPHE
+#                                   (prenom, nom) , Alessia LOI
+
+
+
+
+
+
+#######################################################################################################
+# LIBRAIRIES PYTHON
+#######################################################################################################
+
 import copy
 import random
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
+
+#######################################################################################################
+# OUTILS
+#######################################################################################################
+
+# Méthode permettant d'afficher à l'écran un graphe non orienté et, éventuellement, un titre
+def showGraphe(G, titre = ""):
+
+    plt.title(titre)
+    nx.draw(G, with_labels=True, node_size=1500, node_color="skyblue", pos=nx.circular_layout(G))
+
+    plt.show()   
+
+
+
+#######################################################################################################
+# METHODES
+#######################################################################################################
 
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
 def suppSommet(G, v) :
@@ -20,15 +58,7 @@ def suppSommet(G, v) :
     # On retourne G'
     return (Vprime, Eprime)
 
-# Test méthode suppSommet
-
-V = [12, 7, 3, 4, 0, 1, 9, 10]
-E = [(7,12), (12,4), (12,0), (0,1), (0,9), (7,3), (7,10), (0,3)]
-G = (V,E)
-
-# print("Graphe G\n", G[0], "\n", G[1], "\n")
-# newG = suppSommet(G, 99)
-# print("Graphe G'\n", newG[0], "\n", newG[1])
+#------------------------------------------------------------------------------------------------------
 
 # Méthode permettant de supprimer plusieurs sommets à la fois d'un graphe G et d'obtenir le graphe G' résultant de la suppression des sommets
 def multSuppSommet(G, ensv) :
@@ -39,10 +69,7 @@ def multSuppSommet(G, ensv) :
 
     return modifG
 
-# Test méthode multSuppSommet
-
-newG = multSuppSommet(G, [12, 9])
-# print("Graphe G'\n", newG[0], "\n", newG[1])
+#------------------------------------------------------------------------------------------------------
 
 # Méthode renvoyant un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
 def degresSommet(G) :
@@ -58,6 +85,8 @@ def degresSommet(G) :
 
     return tab
 
+#------------------------------------------------------------------------------------------------------
+
 # Méthode permettant de retourner l'indice du sommet ayant le degres maximal dans le graphe G
 def sommetDegresMax(G) :
 
@@ -68,9 +97,7 @@ def sommetDegresMax(G) :
     v = list(deg.keys())
     return v[degres.index(max(degres))]
 
-# Tests des méthodes degresSommet et sommetDegresSommet
-print(degresSommet(G))
-print(sommetDegresMax(G))
+#------------------------------------------------------------------------------------------------------
 
 # Méthode permettant de générer des graphes aléatoires (avec n sommets et n > 0, p E ]0,1[ la probabilité qu'une arete entre 2 sommet soit créée)
 def randomGraphe(n, p) :
@@ -83,15 +110,57 @@ def randomGraphe(n, p) :
     
     # Liste des aretes
     E = []
-    for v in V :
+    for v1 in V :
         for v2 in V :
-            if v != v2 :
+            if v1 != v2 :
                 if random.uniform(0,1) < p :
-                    if (v2,v) not in E :
-                        E.append((v,v2))
+                    if (v2,v1) not in E :
+                        E.append((v1,v2))
     
     return (V,E)
 
+
+
+
+
+
+#######################################################################################################
+# TESTS
+#######################################################################################################
+
+# Instanciation d'un graphe G
+V = [12, 7, 3, 4, 0, 1, 9, 10]
+E = [(7,12), (12,4), (12,0), (0,1), (0,9), (7,3), (7,10), (0,3)]
+
+G = nx.Graph()
+G.add_nodes_from(V) # sommets
+G.add_edges_from(E) # aretes
+
+showGraphe(G)
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode suppSommet
+# print("Graphe G\n", G[0], "\n", G[1], "\n")
+# newG = suppSommet(G, 99)
+# print("Graphe G'\n", newG[0], "\n", newG[1])
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode multSuppSommet
+#newG = multSuppSommet(G, [12, 9])
+# print("Graphe G'\n", newG[0], "\n", newG[1])
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests des méthodes degresSommet et sommetDegresSommet
+#print(degresSommet(G))
+#print(sommetDegresMax(G))
+
+#------------------------------------------------------------------------------------------------------
+
 # Tests sur la génération aléatoire de graphe
-randG = randomGraphe(8, 0.3)
-print("Graphe G\n", randG[0], "\n", randG[1], "\n")
+#randG = randomGraphe(8, 0.3)
+#print("Graphe G\n", randG[0], "\n", randG[1], "\n")
+
+#------------------------------------------------------------------------------------------------------
