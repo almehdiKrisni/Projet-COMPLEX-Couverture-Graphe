@@ -18,7 +18,6 @@ import copy
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
-from networkx.classes import graph
 
 
 
@@ -42,22 +41,24 @@ def showGraphe(G, titre = ""):
 
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
 def suppSommet(G, v) :
-    if v not in G[0] :
+    if v not in G.keys() :
         print("Le sommet", v, "n'est pas dans le graphe G. Le graphe G' est équivalent à G.\n")
         return G
 
     # On retire le sommet v
-    Vprime = [i for i in G[0] if i != v]
+    del G[v]
 
-    # On retire les aretes liées au sommet v
-    Eprime = []
-    for e in G[1] :
-        if v not in e :
-            Eprime.append(e)
+    # On retire les aretes liées au sommet v en créant une nouvelle liste de jointures
+    for s in G.keys() :
+        l = []
+        for e in G[s] :
+            if (e != v) :
+                l.append(e)
+        G[s] = l
             
 
     # On retourne G'
-    return (Vprime, Eprime)
+    return G
 
 #------------------------------------------------------------------------------------------------------
 
@@ -77,12 +78,8 @@ def degresSommet(G) :
 
     # Création d'un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
     tab = dict()
-    for v in G[0] :
-        val = 0
-        for e in G[1] :
-            if v in e :
-                val += 1
-        tab[v] = val
+    for v in G.keys() :
+        tab[v] = len(list(G[v]))
 
     return tab
 
@@ -106,36 +103,43 @@ def randomGraphe(n, p) :
         print("Il faut que n soit supérieur ou égal à 1 (n = nombre de sommets).\n")
         return ([],[])
 
+    # Création du graphe
+    G = dict()
+
     # Liste des sommets
-    V = [i for i in range(n)]
+    for i in range(n) :
+        G[i] = []
     
-    # Liste des aretes
-    E = []
-    for v1 in V :
-        for v2 in V :
+    # Liste des aretesS
+    for v1 in G.keys() :
+        for v2 in G.keys() :
             if v1 != v2 :
                 if random.uniform(0,1) < p :
-                    if (v2,v1) not in E :
-                        E.append((v1,v2))
+                    if (v2 not in G[v1]) and (v1 not in G[v2]) :
+                        G[v1].append(v2)
+                        G[v2].append(v1)
     
-    return (V,E)
+    # On organise les listes de sommets adjacents pour faciliter la lecture
+    for s in G :
+        G[s].sort()
+
+    return G
 
 #------------------------------------------------------------------------------------------------------
 
 # Méthodes permettant de convertir un tuple (V,E) ou un graphe G en un graphe de la librairie nxgraph
-def convertGraph(V, E) :
-    newG = nx.Graph()
-    newG.add_nodes_from(V) # sommets
-    newG.add_edges_from(E) # aretes
-    return newG
-
 def convertGraph(G) :
     newG = nx.Graph()
-    for v in list(G[0]) :
-        newG.add_node(v) # sommets
-    for e in list(G[1]) :
-        newG.add_edge(e[0], e[1]) # aretes
+
+    newG.add_nodes_from(list(G.keys()))
+    for v1 in G.keys() :
+        for v2 in G.keys() :
+            if (v2, v1) not in newG.edges and v2 in G[v1]:
+                newG.add_edge(v1, v2)
+
     return newG
+
+
 
 
 
@@ -144,8 +148,9 @@ def convertGraph(G) :
 #######################################################################################################
 
 # Instanciation d'un graphe G
-V = [12, 7, 3, 4, 0, 1, 9, 10]
-E = [(7,12), (12,4), (12,0), (0,1), (0,9), (7,3), (7,10), (0,3)]
+G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
+showGraphe(convertGraph(G))
+
 
 # G = nx.Graph()
 # G.add_nodes_from(V) # sommets
@@ -156,29 +161,27 @@ E = [(7,12), (12,4), (12,0), (0,1), (0,9), (7,3), (7,10), (0,3)]
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode suppSommet
-# print("Graphe G\n", G[0], "\n", G[1], "\n")
-# newG = suppSommet(G, 99)
-# print("Graphe G'\n", newG[0], "\n", newG[1])
+# print("Graphe G\n", G, "\n")
+# newG = suppSommet(G, 0)
+# print("Graphe G'\n", newG, "\n")
 
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode multSuppSommet
-# newG = multSuppSommet(G, [12, 9])
-# print("Graphe G'\n", newG[0], "\n", newG[1])
+# newG = multSuppSommet(G, [0, 1])
+# print("Graphe G'\n", newG, "\n")
 
 #------------------------------------------------------------------------------------------------------
 
 # Tests des méthodes degresSommet et sommetDegresSommet
-#print(degresSommet(G))
-#print(sommetDegresMax(G))
+# print(degresSommet(G))
+# print(sommetDegresMax(G))
 
 #------------------------------------------------------------------------------------------------------
 
 # Tests sur la génération aléatoire de graphe
-# for i in range(3) :
-#     randG = randomGraphe(8, 0.1 * (i + 1))
-#     rG = convertGraph(randG)
-#     showGraphe(rG)
-#print("Graphe G\n", randG[0], "\n", randG[1], "\n")
+# randG = randomGraphe(8, 0.1)
+# print("Graphe G\n", randG, "\n")
+# showGraphe(convertGraph(randG))
 
 #------------------------------------------------------------------------------------------------------
