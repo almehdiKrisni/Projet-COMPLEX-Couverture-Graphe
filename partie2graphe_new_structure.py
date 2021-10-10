@@ -18,6 +18,7 @@ import copy
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
+from numpy import empty
 
 
 
@@ -36,7 +37,7 @@ def showGraphe(G, titre = ""):
     
 
 #######################################################################################################
-# METHODES
+# METHODES PARTIE 2
 #######################################################################################################
 
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
@@ -139,15 +140,67 @@ def convertGraph(G) :
 
     return newG
 
+#------------------------------------------------------------------------------------------------------
 
+# Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
+def areteGraphe(G) :
+    E = []
+    for s1 in G.keys() :
+        for s2 in G[s1] :
+            if (s2,s1) not in E :
+                E.append((s1,s2))
+    return E
+
+
+#######################################################################################################
+# METHODES PARTIE 3
+#######################################################################################################
+
+# Couplage = ensemble d'arêtes n'ayant pas d'extrémité en commun
+
+# Méthode representant l'algorithme de couplage sur le graphe G
+def algoCouplage(G) :
+    C = list() # Ensemble représentant le couplage
+
+    # Début de l'algorithme
+    for s1 in list(G.keys()) :
+        for s2 in list(G[s1]) :
+            if (s1 not in C) and (s2 not in C) :
+                C.append(s1)
+                C.append(s2)
+                break
+
+    return C
+
+#------------------------------------------------------------------------------------------------------
+
+# Méthode représentant l'algorithme glouton de couplage sur le graphe G
+def algoGlouton(G) :
+    C = [] # Ensemble représentant le couplage
+    copyG = copy.deepcopy(G) # On réalise une copie de G afin de ne pas modifier l'original
+    E = areteGraphe(copyG) # Liste des arêtes du graphe G
+
+    # Début de l'algorithme
+    while E != [] :
+        v = sommetDegresMax(copyG) # Sommet au degrès maximal
+
+        # Affichage complémentaire (permet de suivre l'évolution de l'algorithme avec les suppressions)
+        # print(v)
+        # showGraphe(convertGraph(copyG))
+
+        suppSommet(copyG, v) # On supprime ce sommet du graphe
+        C.append(v) # On ajoute le sommet à la couverture
+        E = [e for e in E if v not in e] # On supprime les arêtes couvertes par le sommet
+
+    return C
 
 #######################################################################################################
 # TESTS
 #######################################################################################################
 
 # Instanciation d'un graphe G
-G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
-showGraphe(convertGraph(G))
+# G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
+# showGraphe(convertGraph(G))
 
 
 # G = nx.Graph()
@@ -183,3 +236,20 @@ showGraphe(convertGraph(G))
 # showGraphe(convertGraph(randG))
 
 #------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage
+# G = randomGraphe(8, 0.2)
+# print(algoCouplage(G))
+# print(areteGraphe(G))
+# showGraphe(convertGraph(G))
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage glouton
+G = randomGraphe(20, 0.5)
+print(algoGlouton(G))
+# showGraphe(convertGraph(G))
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests de comparaison d'efficacité des 2 algorithmes
