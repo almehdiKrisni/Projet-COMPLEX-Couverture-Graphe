@@ -19,12 +19,69 @@ import random
 import networkx as nx
 import matplotlib.pyplot as plt
 from numpy import empty
+import time
 
 
 
 #######################################################################################################
 # OUTILS
 #######################################################################################################
+
+# Méthodes permettant de convertir un tuple (V,E) ou un graphe G en un graphe de la librairie nxgraph
+def convertGraph(G) :
+    newG = nx.Graph()
+
+    newG.add_nodes_from(list(G.keys()))
+    for v1 in G.keys() :
+        for v2 in G.keys() :
+            if (v2, v1) not in newG.edges and v2 in G[v1]:
+                newG.add_edge(v1, v2)
+
+    return newG
+
+#------------------------------------------------------------------------------------------------------
+
+# Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
+def areteGraphe(G) :
+    E = []
+    for s1 in G.keys() :
+        for s2 in G[s1] :
+            if (s2,s1) not in E :
+                E.append((s1,s2))
+    return E
+
+#------------------------------------------------------------------------------------------------------
+
+# Méthode permettant d'acquérir un graphe G (modelisation : dictionnaire) depuis un fichier texte
+def acquisitionGraphe(nomFichier):
+    G = {}
+    phase = 0
+    with open(nomFichier, 'r') as fichier:
+        for ligne in fichier:
+            if ligne.startswith('Nombre de sommets') or ligne.startswith('Nombre d aretes'):
+                phase = 0
+                continue
+            if ligne.startswith('Sommets'):
+                phase = 1
+                continue
+            if ligne.startswith('Aretes'):
+                phase = 2
+                continue
+            
+            if phase == 1:
+                G[ligne.strip()] = []
+            if phase == 2:
+                e = ligne.strip().split()
+                if len(e) == 2:
+                    (s1, s2) = e
+                    G[s1].append(s2)
+                    G[s2].append(s1)
+                else :
+                    print("Format de fichier invalide : chaque arete doit avoir 2 sommets")
+
+    return G   
+
+#------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher à l'écran un graphe non orienté et, éventuellement, un titre
 def showGraphe(G, titre = ""):
@@ -34,7 +91,39 @@ def showGraphe(G, titre = ""):
 
     plt.show()   
 
+#------------------------------------------------------------------------------------------------------
+
+# !!!!!!!!!!!!!!!!!! PAS TERMINEE JE DOIT CONTINUER ICI !!!!!!!!!!!!!!!!!!!!!!!!!
+def plotPerformances(nbIterations, secondesAutorises, nomFichier):
+    xN = 0 # abscisses : temps de calcul n
+    yP = 0 # ordonnées : performance p, qualité des solutions retournées
     
+    # cree instance alea de G
+
+    # time, algo1, time
+    # time, algo2, time
+
+    # det nMAX
+    # nMAX / 10 , for i in range 1..10,
+    # tracer p
+
+    #2 courbes 2 couleurs
+
+    plt.figure()
+    plt.suptitle("Comparaison", color = 'red')
+    #plt.title(texte)
+    plt.xlabel("temps de calcul n")
+    plt.ylabel("performance p")
+    #plt.scatter(x, y, marker='o', color='red')
+    plt.show()
+
+    # Sauvegarde du tracé
+    if nomFichier != None:
+        plt.savefig(nomFichier, transparent = True)
+
+
+
+
 
 #######################################################################################################
 # METHODES PARTIE 2
@@ -57,7 +146,6 @@ def suppSommet(G, v) :
                 l.append(e)
         G[s] = l
             
-
     # On retourne G'
     return G
 
@@ -126,30 +214,8 @@ def randomGraphe(n, p) :
 
     return G
 
-#------------------------------------------------------------------------------------------------------
 
-# Méthodes permettant de convertir un tuple (V,E) ou un graphe G en un graphe de la librairie nxgraph
-def convertGraph(G) :
-    newG = nx.Graph()
 
-    newG.add_nodes_from(list(G.keys()))
-    for v1 in G.keys() :
-        for v2 in G.keys() :
-            if (v2, v1) not in newG.edges and v2 in G[v1]:
-                newG.add_edge(v1, v2)
-
-    return newG
-
-#------------------------------------------------------------------------------------------------------
-
-# Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
-def areteGraphe(G) :
-    E = []
-    for s1 in G.keys() :
-        for s2 in G[s1] :
-            if (s2,s1) not in E :
-                E.append((s1,s2))
-    return E
 
 
 #######################################################################################################
@@ -194,19 +260,25 @@ def algoGlouton(G) :
 
     return C
 
+
+
+
+
 #######################################################################################################
 # TESTS
 #######################################################################################################
 
-# Instanciation d'un graphe G
+# Instanciation d'un graphe G (modelisation : dictionnaire)
 # G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
 # showGraphe(convertGraph(G))
 
+# Instanciation d'un graphe G (modelisation : librairie graphe networkx)
+# V = [0, 1, 2, 3]
+# E = [(0,1), (0,2), (0,3), (1,2)]
 
 # G = nx.Graph()
 # G.add_nodes_from(V) # sommets
 # G.add_edges_from(E) # aretes
-
 # showGraphe(G)
 
 #------------------------------------------------------------------------------------------------------
@@ -238,18 +310,26 @@ def algoGlouton(G) :
 #------------------------------------------------------------------------------------------------------
 
 # Tests sur l'algorithme de couplage
-# G = randomGraphe(8, 0.2)
-# print(algoCouplage(G))
+G = randomGraphe(8, 0.2)
+print(algoCouplage(G))
 # print(areteGraphe(G))
 # showGraphe(convertGraph(G))
 
 #------------------------------------------------------------------------------------------------------
 
 # Tests sur l'algorithme de couplage glouton
-G = randomGraphe(20, 0.5)
-print(algoGlouton(G))
+# G = randomGraphe(20, 0.5)
+# print(algoGlouton(G))
 # showGraphe(convertGraph(G))
 
 #------------------------------------------------------------------------------------------------------
 
 # Tests de comparaison d'efficacité des 2 algorithmes
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode acquisitionGraphe depuis un fichier texte
+# G3 = acquisitionGraphe("exempleinstance.txt")
+# print("G = ", G3, "\n")
+# showGraphe(convertGraph(G3))
+
