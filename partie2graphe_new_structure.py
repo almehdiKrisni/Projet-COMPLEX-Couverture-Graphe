@@ -119,7 +119,7 @@ def plotPerformances(nbIterations, secondesAutorises, nomFichier):
 
     # Sauvegarde du tracé
     if nomFichier != None:
-        plt.savefig(nomFichier, transparent = True)
+        plt.savefig("TestResults/" + nomFichier, transparent = True)
 
 
 
