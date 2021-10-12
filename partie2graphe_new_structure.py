@@ -101,10 +101,12 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, nom
     resAlgoCouplage = []
     resAlgoGlouton = []
 
-    # Calcul de la taille nMax (nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises)
+    # nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
+    
+    # Calcul de la taille nMax pour l'algorithme algoCouplage(G)
     nMaxACouplage = 0
     t = 0
-    while t < secondesMaxAutorises :
+    while t < secondesMaxAutorises:
         nMaxACouplage += 1
         
         # Méthode permettant de générer des graphes aléatoires
@@ -115,11 +117,12 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, nom
         t2 = time.time()
         t = t2-t1
 
-
+    # Calcul de la taille nMax pour l'algorithme algoGluton(G)
     nMaxAGlouton = 0
     t = 0
-    while t < secondesMaxAutorises :
+    while t < secondesMaxAutorises:
         nMaxAGlouton += 1
+
         # Méthode permettant de générer des graphes aléatoires
         G = randomGraphe(nMaxAGlouton, p)
 
@@ -133,16 +136,18 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, nom
         print("nMaxACouplage = ", nMaxACouplage, "; nMaxAGlouton = ", nMaxAGlouton, "\n")
 
 
-    yCouplage = []  # ordonnées : liste des temps de calcul moyen, pour l'algorithme algo_couplage
-    yGlouton = []   # ordonnées : liste des temps de calcul moyen, pour l'algorithme algo_glouton
+    yCouplage = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoCouplage(G)
+    yGlouton = []   # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoGluton(G)  
     
-    for i in range(1, 11) :
+    # Pour chaque 1/10 de nMax (1/10 nMaxACouplage, 1/10 nMaxAGlouton)
+    for i in range(1, 11):
 
         tabTempsCouplage = []
         tabTempsGlouton = []
         moyTempsCouplage = 0
         moyTempsGlouton = 0
 
+        # Pour chacune des nbIterations démandées
         for ite in range(nbIterations):
 
             # Méthode permettant de générer des graphes aléatoires
@@ -171,6 +176,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, nom
             if verbose : 
                 print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTempsCouplage =", tabTempsCouplage, "\n\t\ttabTempsGlouton = ", tabTempsGlouton)
 
+        # Calcul et stockage du temps d'execution moyen de chaque algorithme par rapport aux 'nbIterations' éxecutions
         moyTempsCouplage = sum(tabTempsCouplage)/len(tabTempsCouplage)
         moyTempsGlouton = sum(tabTempsGlouton)/len(tabTempsGlouton)
 
@@ -182,7 +188,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, nom
             print("----------------------------------------------------------------------------------------------\n")
 
 
-    # Construction et affichage du graphique
+    # Construction et affichage du tracé
     x = ["1/10 nMAX", "2/10 nMAX", "3/10 nMAX", "4/10 nMAX", "5/10 nMAX", "6/10 nMAX", "7/10 nMAX", "8/10 nMAX", "9/10 nMAX", "nMAX"]
     plt.figure()
     plt.suptitle("Comparaison algo_couplage(G) et algo_glouton(G)", color = 'red')
