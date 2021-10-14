@@ -94,15 +94,17 @@ def showGraphe(G, titre = ""):
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant d'afficher un graphique de comparaison des performances (temps de calcul) des algorithmes algo_couplage et algo_glouton
+# Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme algoCouplage
 def plotPerformancesCouplage(p, nbIterations, secondesMaxAutorises, verbose = False, save = False):
     """ p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
+        nbIterations : nombre d'éxecutions de l'algorithme algoCouplage, dans le but d'en déduir une performance moyenne
+        secondesMaxAutorises : temps maximum autorisé pour l'éxecution de l'algorithme algoCouplage
+        verbose : "True" pour afficher le détail des itérations
+        save : "True" pour enregistrer le tracé en format jpg
     """
-    resAlgoCouplage = []
-
-    # nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     
-    # Calcul de la taille nMax pour l'algorithme algoCouplage(G)
+    # Calcul de la taille nMaxACouplage pour l'algorithme algoCouplage(G)
+    # nMaxACouplage : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     nMaxACouplage = 0
     t = 0
     while t < secondesMaxAutorises:
@@ -119,146 +121,176 @@ def plotPerformancesCouplage(p, nbIterations, secondesMaxAutorises, verbose = Fa
     if verbose :
         print("nMaxACouplage = ", nMaxACouplage, "\n")
 
-    print("hello 1")
 
-    yCouplage = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoCouplage(G)
+    y1Couplage = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoCouplage(G)
+    y2Couplage = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme algoCouplage(G)
+
+    xCouplage = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nMaxACouplage, 2/10 nMaxACouplage, ... , nMaxACouplage}
     
-    # Pour chaque 1/10 de nMax (1/10 nMaxACouplage, 1/10 nMaxAGlouton)
+    # Pour chaque 1/10 de nMaxACouplage
     for i in range(1, 11):
 
         tabTempsCouplage = []
         moyTempsCouplage = 0
+        resAlgoCouplage = []
+        moyQualiteSolutions = 0
 
-        # Pour chacune des nbIterations démandées
+        # Pour chacune des nbIterations démandées en paramètre
         for ite in range(nbIterations):
 
             # Méthode permettant de générer des graphes aléatoires
-            G = randomGraphe((int)(nMaxACouplage * i/10), p)
+            G = randomGraphe(int(nMaxACouplage * i/10), p)
 
             # Execution et recueil statistiques algoCouplage(G)
             t1 = time.time()
             res = algoCouplage(G)
             t2 = time.time()
             t = t2-t1
+
             tabTempsCouplage.append(t) # temps de calcul de l'algorithme pour l'itération courante
             resAlgoCouplage.append(len(res)) # qualité des solutions pour l'itération courante
 
             if verbose : 
-                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTempsCouplage =", tabTempsCouplage, "\n")
+                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTempsCouplage =", tabTempsCouplage, "\n\t\tresAlgoCouplage =", resAlgoCouplage, "\n")
 
         # Calcul et stockage du temps d'execution moyen de chaque algorithme par rapport aux 'nbIterations' éxecutions
         moyTempsCouplage = sum(tabTempsCouplage)/len(tabTempsCouplage)
+        moyQualiteSolutions = int(sum(resAlgoCouplage)/len(resAlgoCouplage))
 
-        yCouplage.append(moyTempsCouplage)
+        y1Couplage.append(moyTempsCouplage)
+        y2Couplage.append(moyQualiteSolutions)
+        xCouplage.append(int(nMaxACouplage * i/10))
 
         if verbose : 
-            print("\nx = ", i, "/10 nMax : moyTempsCouplage =", moyTempsCouplage)
+            print("\nx = ", i, "/10 nMax (" + str(int(nMaxACouplage * i/10)) + ") : moyTempsCouplage =", moyTempsCouplage, "moyQualiteSolutions =", moyQualiteSolutions)
             print("----------------------------------------------------------------------------------------------\n")
 
-    print("hello 2")
 
+    # Affichage graphique
+    plt.figure(figsize = (10, 10))
+    plt.suptitle("Performances de l'algorithme algo_couplage\nnMax pour " + str(secondesMaxAutorises) + " secondes = " + str(nMaxACouplage), color = 'red', size = 15)
+    plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
-    # Construction et affichage du tracé
-    plt.rc('xtick', labelsize=5)    # fontsize of the tick labels
+    # Construction et affichage du tracé "temps de calcul"
+    plt.subplot(2, 1, 1)
+    plt.title("Analyse du temps de calcul en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("t(n)") # temps de calcul en fonction du nombre de sommets du graphe G
+    plt.plot(xCouplage, y1Couplage, color = 'blue')
 
-    x = ["1/10 nMAX", "2/10 nMAX", "3/10 nMAX", "4/10 nMAX", "5/10 nMAX", "6/10 nMAX", "7/10 nMAX", "8/10 nMAX", "9/10 nMAX", "nMAX"]
-    plt.figure()
-    plt.suptitle("Performances de l'algorithme de couplage classique", color = 'red')
-    plt.title("Analyse des temps de calcul en fonction de nMax. nMax algo_couplage = " + str(nMaxACouplage))
-    plt.xlabel("n")
-    plt.ylabel("t(n)")
-    plt.plot(x, yCouplage)
-    plt.legend()
+    # Construction et affichage du tracé "qualité des solutions"
+    plt.subplot(2, 1, 2)
+    plt.title("Analyse de la qualité des solutions en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
+    plt.plot(xCouplage, y2Couplage, color = 'green')
 
     # Sauvegarde du tracé
     if save != None:
-        plt.savefig("TestResults/algo_couplage_" + (str)(datetime.datetime.today()) + ".jpeg", transparent = True)
+        plt.savefig("TestResults/algo_couplage_" + str(datetime.date.today()) + ".jpeg", transparent = True)
 
     plt.show()
 
+#------------------------------------------------------------------------------------------------------
 
-
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Plot pour les performances de l'algorithme glouton
+# Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme algoGlouton
 def plotPerformancesGlouton(p, nbIterations, secondesMaxAutorises, verbose = False, save = False):
     """ p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
+        nbIterations : nombre d'éxecutions de l'algorithme algoGlouton, dans le but d'en déduir une performance moyenne
+        secondesMaxAutorises : temps maximum autorisé pour l'éxecution de l'algorithme algoGlouton
+        verbose : "True" pour afficher le détail des itérations
+        save : "True" pour enregistrer le tracé en format jpg
     """
-    resAlgoGlouton = []
 
-    # nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
-
-    # Calcul de la taille nMax pour l'algorithme algoGluton(G)
+    # Calcul de la taille nMaxAGlouton pour l'algorithme algoGlouton(G)
+    # nMaxAGlouton : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     nMaxAGlouton = 0
     t = 0
     while t < secondesMaxAutorises:
         nMaxAGlouton += 1
-        print(nMaxAGlouton)
-
+        
         # Méthode permettant de générer des graphes aléatoires
-
         G = randomGraphe(nMaxAGlouton, p)
 
         t1 = time.time()
         algoGlouton(G)
         t2 = time.time()
         t = t2-t1
-        
+
 
     if verbose :
         print("nMaxAGlouton = ", nMaxAGlouton, "\n")
 
-    yGlouton = []   # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoGluton(G)  
+
+    y1Glouton = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoGlouton(G)
+    y2Glouton = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme algoGlouton(G)
+
+    xGlouton = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nMaxAGlouton, 2/10 nMaxAGlouton, ... , nMaxAGlouton}
     
-    # Pour chaque 1/10 de nMax (1/10 nMaxACouplage, 1/10 nMaxAGlouton)
+    # Pour chaque 1/10 de nMaxAGlouton
     for i in range(1, 11):
 
         tabTempsGlouton = []
         moyTempsGlouton = 0
+        resAlgoGlouton = []
+        moyQualiteSolutions = 0
 
-        # Pour chacune des nbIterations démandées
+        # Pour chacune des nbIterations démandées en paramètre
         for ite in range(nbIterations):
 
             # Méthode permettant de générer des graphes aléatoires
-            G = randomGraphe((int)(nMaxAGlouton * i/10), p)
+            G = randomGraphe(int(nMaxAGlouton * i/10), p)
 
-            # Execution et recueil statistiques algoGluton(G)
+            # Execution et recueil statistiques algoGlouton(G)
             t1 = time.time()
             res = algoGlouton(G)
             t2 = time.time()
             t = t2-t1
+
             tabTempsGlouton.append(t) # temps de calcul de l'algorithme pour l'itération courante
             resAlgoGlouton.append(len(res)) # qualité des solutions pour l'itération courante
 
             if verbose : 
-                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTempsGlouton = ", tabTempsGlouton)
+                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTempsGlouton =", tabTempsGlouton, "\n\t\tresAlgoGlouton =", resAlgoGlouton, "\n")
 
-        # Calcul et stockage du temps d'execution moyen de chaque algorithme par rapport aux 'nbIterations' éxecutions
+        # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
         moyTempsGlouton = sum(tabTempsGlouton)/len(tabTempsGlouton)
+        moyQualiteSolutions = int(sum(resAlgoGlouton)/len(resAlgoGlouton))
 
-        yGlouton.append(moyTempsGlouton)
+        y1Glouton.append(moyTempsGlouton)
+        y2Glouton.append(moyQualiteSolutions)
+        xGlouton.append(int(nMaxAGlouton * i/10))
 
         if verbose : 
-            print("\nx = ", i, "/10 nMax :\tmoyTempsGlouton = ", moyTempsGlouton)
+            print("\nx = ", i, "/10 nMax (" + str(int(nMaxAGlouton * i/10)) + ") : moyTempsGlouton =", moyTempsGlouton, "moyQualiteSolutions =", moyQualiteSolutions)
             print("----------------------------------------------------------------------------------------------\n")
 
 
-    # Construction et affichage du tracé
-    plt.rc('xtick', labelsize=5)    # fontsize of the tick labels
+    # Affichage graphique
+    plt.figure(figsize = (10, 10))
+    plt.suptitle("Performances de l'algorithme algo_glouton\nnMax pour " + str(secondesMaxAutorises) + " secondes = " + str(nMaxAGlouton), color = 'red', size = 15)
+    plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
-    x = ["1/10 nMAX", "2/10 nMAX", "3/10 nMAX", "4/10 nMAX", "5/10 nMAX", "6/10 nMAX", "7/10 nMAX", "8/10 nMAX", "9/10 nMAX", "nMAX"]
-    plt.figure()
-    plt.suptitle("Performances de l'algorithme de couplage glouton", color = 'red')
-    plt.title("Analyse des temps de calcul en fonction de nMax. nMax algo_glouton =" + str(nMaxAGlouton))
-    plt.xlabel("n")
-    plt.ylabel("t(n)")
-    plt.plot(x, yGlouton)
-    plt.legend()
+    # Construction et affichage du tracé "temps de calcul"
+    plt.subplot(2, 1, 1)
+    plt.title("Analyse du temps de calcul en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("t(n)") # temps de calcul en fonction du nombre de sommets du graphe G
+    plt.plot(xGlouton, y1Glouton, color = 'blue')
+
+    # Construction et affichage du tracé "qualité des solutions"
+    plt.subplot(2, 1, 2)
+    plt.title("Analyse de la qualité des solutions en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
+    plt.plot(xGlouton, y2Glouton, color = 'green')
 
     # Sauvegarde du tracé
     if save != None:
-        plt.savefig("TestResults/algo_glouton_" + (str)(datetime.datetime.today()) + ".jpeg", transparent = True)
+        plt.savefig("TestResults/algo_glouton_" + str(datetime.date.today()) + ".jpeg", transparent = True)
 
     plt.show()
+
 
 
 
@@ -522,12 +554,12 @@ def branchement(G) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances(p, nbIterations, secondesMaxAutorises, verbose = False, save = False)
-# plotPerformancesGlouton(0.3, 15, 0.01, verbose=True, save = False)
-# plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save = False)
+# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
+#plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
+plotPerformancesGlouton(0.3, 15, 0.04, verbose=True, save=True)
 
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement
-print(branchement(acquisitionGraphe("exempleinstance.txt")))
-showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+# print(branchement(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
