@@ -124,8 +124,7 @@ def plotPerformancesCouplage(p, nbIterations, secondesMaxAutorises, verbose = Fa
 
     y1Couplage = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoCouplage(G)
     y2Couplage = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme algoCouplage(G)
-
-    xCouplage = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nMaxACouplage, 2/10 nMaxACouplage, ... , nMaxACouplage}
+    xCouplage = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nMaxACouplage, 2/10 nMaxACouplage, ... , nMaxACouplage}
     
     # Pour chaque 1/10 de nMaxACouplage
     for i in range(1, 11):
@@ -206,7 +205,7 @@ def plotPerformancesGlouton(p, nbIterations, secondesMaxAutorises, verbose = Fal
     # nMaxAGlouton : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     nMaxAGlouton = 0
     t = 0
-    while t < secondesMaxAutorises:
+    while t < secondesMaxAutorises :
         nMaxAGlouton += 1
         
         # Méthode permettant de générer des graphes aléatoires
@@ -224,11 +223,10 @@ def plotPerformancesGlouton(p, nbIterations, secondesMaxAutorises, verbose = Fal
 
     y1Glouton = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme algoGlouton(G)
     y2Glouton = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme algoGlouton(G)
-
     xGlouton = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nMaxAGlouton, 2/10 nMaxAGlouton, ... , nMaxAGlouton}
     
     # Pour chaque 1/10 de nMaxAGlouton
-    for i in range(1, 11):
+    for i in range(1, 11) :
 
         tabTempsGlouton = []
         moyTempsGlouton = 0
@@ -306,7 +304,7 @@ def suppSommet(initG, v) :
         return initG
 
     # On réalise une copie de initG pour ne pas le modifier
-    G = copy.deepcopy(initG)
+    G = copy.copy(initG)
 
     # On retire le sommet v
     del G[v]
@@ -417,7 +415,7 @@ def algoCouplage(G) :
 #------------------------------------------------------------------------------------------------------
 
 # Méthode représentant l'algorithme glouton de couplage sur le graphe G
-def algoGlouton(G, visual=False) :
+def algoGlouton(G) :
     C = [] # Ensemble représentant le couplage
     copyG = copy.deepcopy(G) # On réalise une copie de G afin de ne pas modifier l'original
     E = areteGraphe(copyG) # Liste des arêtes du graphe G
@@ -426,11 +424,7 @@ def algoGlouton(G, visual=False) :
     while E != [] :
         v = sommetDegresMax(copyG) # Sommet au degrès maximal
 
-        if (visual) :
-            print(v)
-            showGraphe(convertGraph(copyG))
-
-        suppSommet(copyG, v) # On supprime ce sommet du graphe
+        copyG = suppSommet(copyG, v) # On supprime ce sommet du graphe
         C.append(v) # On ajoute le sommet à la couverture
         E = [e for e in E if v not in e] # On supprime les arêtes couvertes par le sommet
 
@@ -561,7 +555,7 @@ def branchement(G, randomSelection=False) :
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
 # plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
-plotPerformancesGlouton(0.3, 15, 0.01, verbose=True, save=False)
+plotPerformancesGlouton(0.3, 15, 0.001, verbose=True, save=False)
 
 #------------------------------------------------------------------------------------------------------
 
