@@ -305,7 +305,7 @@ def suppSommet(initG, v) :
         print("Le sommet", v, "n'est pas dans le graphe G. Le graphe G' est équivalent à G.\n")
         return initG
 
-    # On effectue une copie de G
+    # On réalise une copie de initG pour ne pas le modifier
     G = copy.deepcopy(initG)
 
     # On retire le sommet v
@@ -443,7 +443,7 @@ def algoGlouton(G, visual=False) :
 #######################################################################################################
 
 # Fonction réalisant le branchement
-def branchement(G) :
+def branchement(G, randomSelection=False) :
     optiC = None # optiC = ensemble de sommets représentant la solution optimate (on cherche à minimiser la taille de la couverture)
 
     areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe
@@ -456,8 +456,13 @@ def branchement(G) :
     # Début de l'algorithme de branchement
     while (statesToStudy != []) :
 
-        # On récupère la tete de la file et on la supprime de statesToStudy
-        state = statesToStudy.pop(0)
+        # Choix de la méthode de sélection d'état
+        if (randomSelection) :
+            # On récupère un état aléatoire de la liste d'états à étudier
+            state = statesToStudy.pop(random.randint(0, len(statesToStudy) - 1))
+        else :
+            # On récupère la tete de la file et on la supprime de statesToStudy
+            state = statesToStudy.pop(0)
 
         # Cas où G est un graphe sans aretes
         if (areteGraphe(state[1]) == []) :
@@ -555,11 +560,11 @@ def branchement(G) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-#plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
-plotPerformancesGlouton(0.3, 15, 0.04, verbose=True, save=True)
+# plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
+plotPerformancesGlouton(0.3, 15, 0.01, verbose=True, save=False)
 
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt")))
+# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
 # showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
