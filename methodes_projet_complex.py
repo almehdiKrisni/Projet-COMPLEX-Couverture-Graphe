@@ -522,7 +522,7 @@ def calculBornes(G) :   # a verifier!!!
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement
+# Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
 def branchement2(G, randomSelection=False) :
     nbNoeudsGeneres = 0 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
