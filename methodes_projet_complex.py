@@ -436,7 +436,7 @@ def algoGlouton(G) :
 # METHODES PARTIE 4
 #######################################################################################################
 
-# Fonction réalisant le branchement
+# Méthode réalisant le branchement de manière impartiale (sans indice)
 def branchement(G, randomSelection=False) :
     optiC = None # optiC = ensemble de sommets représentant la solution optimate (on cherche à minimiser la taille de la couverture)
 
@@ -478,8 +478,35 @@ def branchement(G, randomSelection=False) :
     return optiC
 
 
-    
 
+
+#------------------------------------------------------------------------------------------------------
+
+# Méthode réalisant le branchement de manière intelligente (insertion d'une solution réalisable dans chaque noeud)
+def branchementBornesV1(G) :
+    # optiC = ensemble de sommets représentant la solution optimale
+    optiC = algoCouplage(G)
+
+    areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe
+
+    # Un état est de la forme [ Couverture C actuelle, Graphe G, Solution réalisable ]
+    statesToStudy = [] # Pile des états du branchement à étudier
+    statesToStudy.append([[areteInitiale[0]], suppSommet(G, areteInitiale[0]), algoCouplage(suppSommet(G, areteInitiale[0]))])
+    statesToStudy.append([[areteInitiale[1]], suppSommet(G, areteInitiale[1]), algoCouplage(suppSommet(G, areteInitiale[1]))])
+
+    # Début de l'algorithme de branchement
+    while (statesToStudy != []) :
+
+        # On récupère l'état en tete de la liste
+        state = statesToStudy.pop(0)
+
+        # On vérifie la condition sur la taille du couplage
+        # if (len(optiC) > len(state[2])) :
+
+            # Si la taille du couplage obtenu en retir
+
+    # On retourne optiC
+    return optiC
 
 
 #######################################################################################################
@@ -555,10 +582,10 @@ def branchement(G, randomSelection=False) :
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
 # plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
-plotPerformancesGlouton(0.3, 15, 0.001, verbose=True, save=False)
+# plotPerformancesGlouton(0.3, 15, 0.001, verbose=True, save=False)
 
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
+showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
