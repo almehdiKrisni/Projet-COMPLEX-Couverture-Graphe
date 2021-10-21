@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 from numpy import empty, save
 import time
 import datetime
+import math
 
 
 
@@ -357,6 +358,15 @@ def sommetDegresMax(G) :
 
 #------------------------------------------------------------------------------------------------------
 
+# Méthode permettant de retourner le degre maximum parmi les degres des sommets du graphe G
+def degreMax(G) :
+
+    deg = degresSommet(G) # dictionnaire { nbSommet : sommetsAdjacents }
+    degres = list(deg.values())
+    return max(degres)
+
+#------------------------------------------------------------------------------------------------------
+
 # Méthode permettant de générer des graphes aléatoires
 def randomGraphe(n, p) :
     """ n : nombre de sommets, n > 0
@@ -438,7 +448,8 @@ def algoGlouton(G) :
 
 # Méthode réalisant le branchement de manière impartiale (sans indice)
 def branchement(G, randomSelection=False) :
-    optiC = None # optiC = ensemble de sommets représentant la solution optimate (on cherche à minimiser la taille de la couverture)
+    nbNoeudsGeneres = 0 # nombre de noeuds générés
+    optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
     areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe
 
@@ -455,30 +466,109 @@ def branchement(G, randomSelection=False) :
             # On récupère un état aléatoire de la liste d'états à étudier
             state = statesToStudy.pop(random.randint(0, len(statesToStudy) - 1))
         else :
-            # On récupère la tete de la file et on la supprime de statesToStudy
+            # On récupère la tete de la pile et on la supprime de statesToStudy
             state = statesToStudy.pop(0)
 
-        # Cas où G est un graphe sans aretes
+        # Cas où G (state[1]) est un graphe sans aretes
         if (areteGraphe(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
 
-        # Cas où G n'est pas un graphe sans aretes
+        # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
             # On récupère une arete aléatoire
             areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
             leftNode = areteEtude[0]
             rightNode = areteEtude[1]
+            nbNoeudsGeneres += 1
 
             # On ajoute deux feuilles à la liste (on priorise le fils de gauche, soit le premier élément de l'arete étudiée)
             statesToStudy.insert(0, [state[0] + [rightNode], suppSommet(state[1], rightNode)])
             statesToStudy.insert(0, [state[0] + [leftNode], suppSommet(state[1], leftNode)])
         
+    print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
+
     # On retourne C
     return optiC
 
+#------------------------------------------------------------------------------------------------------
 
+<<<<<<< HEAD
+=======
+def calculBornes(G) :   # a verifier!!!
+    b1 = 0
+    b2 = 0
+    b3 = 0
+    l = []
 
+    M = algoCouplage(G) # M est un couplage de G
+    C = branchement(G, randomSelection=False) # C est une couverture de G
+
+    n = len(list(G.keys())) # nombre de sommets
+    m = len(areteGraphe(G)) # nombre d'aretes
+    c = len(C) # cardinalite de la couverture minimale
+
+    b1 = math.ceil(m/degreMax(G)) # partie entière superieure de (m/degreMax)
+    l.append(b1)
+
+    b2 = len(M)
+    l.append(b2)
+    
+    b3 = (2*n-1-(math.sqrt( ((2*n-1)**2)-8*m) ))/2
+    l.append(b3)
+    
+    maxB = max(l)
+    print("b1 =", b1, "\nb2 =", b2, "\nb3 =", b3, "\n|C| =", c, "\n|C| >= max{b1,b2,b3} :\t", c, ">=", maxB)
+
+    return maxB
+
+#------------------------------------------------------------------------------------------------------
+
+# Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
+def branchement2(G, randomSelection=False) :
+    nbNoeudsGeneres = 0 # nombre de noeuds générés
+    optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
+
+    areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe
+
+    # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G ]
+    statesToStudy = [] # Pile des états du branchement à étudier
+    statesToStudy.append([[areteInitiale[0]], suppSommet(G, areteInitiale[0])])
+    statesToStudy.append([[areteInitiale[1]], suppSommet(G, areteInitiale[1])])
+
+    # Début de l'algorithme de branchement
+    while (statesToStudy != []) :
+>>>>>>> 18f88fbfd16c438b1eabb71e0907bbeeb21e2798
+
+        # Choix de la méthode de sélection d'état
+        if (randomSelection) :
+            # On récupère un état aléatoire de la liste d'états à étudier
+            state = statesToStudy.pop(random.randint(0, len(statesToStudy) - 1))
+        else :
+            # On récupère la tete de la pile et on la supprime de statesToStudy
+            state = statesToStudy.pop(0)
+
+        # Cas où G (state[1]) est un graphe sans aretes
+        if (areteGraphe(state[1]) == []) :
+            if (optiC == None) or (len(state[0]) < len(optiC)) :
+                optiC = state[0]
+
+        # Cas où G (state[1]) n'est pas un graphe sans aretes
+        else :
+            # On récupère une arete aléatoire
+            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
+            leftNode = areteEtude[0]
+            rightNode = areteEtude[1]
+            nbNoeudsGeneres += 1
+
+            # On ajoute deux feuilles à la liste (on priorise le fils de gauche, soit le premier élément de l'arete étudiée)
+            statesToStudy.insert(0, [state[0] + [rightNode], suppSommet(state[1], rightNode)])
+            statesToStudy.insert(0, [state[0] + [leftNode], suppSommet(state[1], leftNode)])
+        
+    print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
+
+    # On retourne C
+    return optiC
 
 #------------------------------------------------------------------------------------------------------
 
@@ -574,9 +664,9 @@ def branchementBornesV1(G) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode acquisitionGraphe depuis un fichier texte
-# G3 = acquisitionGraphe("exempleinstance.txt")
-# print("G = ", G3, "\n")
-# showGraphe(convertGraph(G3))
+G = acquisitionGraphe("exempleinstance.txt")
+print("G = ", G, "\n")
+# showGraphe(convertGraph(G))
 
 #------------------------------------------------------------------------------------------------------
 
@@ -587,5 +677,12 @@ def branchementBornesV1(G) :
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement
+<<<<<<< HEAD
 print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
 showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+=======
+# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
+
+print(degreMax(G))
+calculBornes(G)
+>>>>>>> 18f88fbfd16c438b1eabb71e0907bbeeb21e2798
