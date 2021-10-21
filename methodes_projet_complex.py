@@ -506,18 +506,19 @@ def calculBornes(G) :   # a verifier!!!
     m = len(areteGraphe(G)) # nombre d'aretes
     c = len(C) # cardinalite de la couverture minimale
 
-    b1 = math.ceil(m/degreMax(G)) # partie entière superieure de m/degreMax
+    b1 = math.ceil(m/degreMax(G)) # partie entière superieure de (m/degreMax)
     l.append(b1)
 
     b2 = len(M)
     l.append(b2)
     
-    b3 = (2*n-1-(math.sqrt((2*n-1)**2-8*m)))/2
+    b3 = (2*n-1-(math.sqrt( ((2*n-1)**2)-8*m) ))/2
     l.append(b3)
     
-    print("b1 =", b1, "\nb2 =", b2, "\nb3 =", b3, "\n|C| =", c)
+    maxB = max(l)
+    print("b1 =", b1, "\nb2 =", b2, "\nb3 =", b3, "\n|C| =", c, "\n|C| >= max{b1,b2,b3} :\t", c, ">=", maxB)
 
-    return max(b1, b2, b3)
+    return maxB
 
 #------------------------------------------------------------------------------------------------------
 
