@@ -317,7 +317,16 @@ def suppSommet(initG, v) :
             if (e != v) :
                 l.append(e)
         G[s] = l
-            
+
+    # On retire de G' les clés contenant des listes vides
+    cleanG = []
+    for k in G.keys() :
+        if G[k] == []:
+            cleanG.append(k)
+
+    for s in cleanG:
+        del G[s]
+        
     # On retourne G'
     return G
 
@@ -602,33 +611,32 @@ def branchementBornesCouplage(G, verbose=False) :
 
             # On récupère la première arete du branchement
             areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
-            grapheEtude = state[1]
 
-            # Calcul des informations du noeud de gauche
-            newGraphe = suppSommet(grapheEtude, areteEtude[0])
-            print(newGraphe)
+            # Calcul des informations du noeud de droite
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
             newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
-            print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "bornes Inf sup =", newBorneInf, newBorneSup )
+            print("niveau node droite it.", i, ": arete =", areteEtude, "u =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
+            if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
+                statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup])
+                nbNoeudsGeneres += 1
+                print("on ajoute ce noeud droit")
+
+            # Calcul des informations du noeud de gauche
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[0])
+            newBorneInf = calculBorneInf(newGraphe)
+            newBorneSup = len(algoCouplage(newGraphe))
+            print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
                 print("on ajoute ce noeud gauche")
 
-            # Calcul des informations du noeud de droite
-            newGraphe = suppSommet(grapheEtude, areteEtude[1])
-            newBorneInf = calculBorneInf(newGraphe)
-            newBorneSup = len(algoCouplage(newGraphe))
-            print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "bornes Inf sup =", newBorneInf, newBorneSup )
 
-
-            if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
-                statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup])
-                nbNoeudsGeneres += 1
-                print("on ajoute ce noeud droit")
-        
     if (verbose) :
         print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
 
