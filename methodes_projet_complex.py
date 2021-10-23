@@ -552,13 +552,16 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
     statesToStudy = list() # Pile des états du branchement à étudier
+
+    # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
+    # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
     
     # Création des informations du noeud de gauche
     newGraphe = suppSommet(G, areteInitiale[0])
     newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
 
-    if (not(newBorneSup < newBorneInf) or newBorneInf > len(optiC)) :
+    if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
 
     # Création des informations du noeud de droite
@@ -566,9 +569,7 @@ def branchementBornesCouplage(G, verbose=False) :
     newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
 
-    # CONDITION POUR ELAGUER : BORNE SUP < BORNE INF
-
-    if (not(newBorneSup < newBorneInf) or newBorneInf > len(optiC)) :
+    if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
 
     # Début de l'algorithme de branchement
@@ -594,7 +595,7 @@ def branchementBornesCouplage(G, verbose=False) :
             newBorneSup = len(algoCouplage(newGraphe))
 
             if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
-                statesToStudy.insert(0, [[state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup]])
+                statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
 
             # Calcul des informations du noeud de droite
@@ -603,7 +604,7 @@ def branchementBornesCouplage(G, verbose=False) :
             newBorneSup = len(algoCouplage(newGraphe))
 
             if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
-                statesToStudy.insert(0, [[state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup]])
+                statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
         
     if (verbose) :
