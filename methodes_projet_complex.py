@@ -606,6 +606,7 @@ def branchementBornesCouplage(G, verbose=False) :
 
             # Calcul des informations du noeud de gauche
             newGraphe = suppSommet(grapheEtude, areteEtude[0])
+            print(newGraphe)
             newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
             print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "bornes Inf sup =", newBorneInf, newBorneSup )
