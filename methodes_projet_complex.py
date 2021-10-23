@@ -447,7 +447,7 @@ def algoGlouton(G) :
 #######################################################################################################
 
 # Méthode réalisant le branchement de manière impartiale (sans indice)
-def branchement(G, randomSelection=False) :
+def branchement(G, randomSelection=False, verbose=False) :
     nbNoeudsGeneres = 0 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
@@ -486,7 +486,8 @@ def branchement(G, randomSelection=False) :
             statesToStudy.insert(0, [state[0] + [rightNode], suppSommet(state[1], rightNode)])
             statesToStudy.insert(0, [state[0] + [leftNode], suppSommet(state[1], leftNode)])
         
-    print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
+    if (verbose) :
+        print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
 
     # On retourne C
     return optiC
@@ -532,14 +533,12 @@ def calculBorneInf(G, verbose=False) :   # a verifier!!!
 #------------------------------------------------------------------------------------------------------
 
 # Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
-def branchementBornesCouplage(G) :
+def branchementBornesCouplage(G, verbose=False) :
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
     rootBorneSup = len(algoCouplage(G))
-
-    print("bornes de la racine", rootBorneInf, rootBorneSup)
 
     # Dans le cas où les deux bornes sont égales, on retourne immédiatement la solution
     if (rootBorneInf >= rootBorneSup) :
@@ -552,35 +551,28 @@ def branchementBornesCouplage(G) :
     areteInitiale = areteGraphe(G)[0]
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
-    statesToStudy = [] # Pile des états du branchement à étudier
+    statesToStudy = list() # Pile des états du branchement à étudier
     
     # Création des informations du noeud de gauche
     newGraphe = suppSommet(G, areteInitiale[0])
-    newBorneInf = calculBorneInf(newGraphe)
+    newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
 
-    print("bornes premier noeud a creer", newBorneInf, newBorneSup)
-
-    if not(newBorneSup < newBorneInf) :
-        print("hello")
+    if (not(newBorneSup < newBorneInf) or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
 
     # Création des informations du noeud de droite
     newGraphe = suppSommet(G, areteInitiale[1])
-    newBorneInf = calculBorneInf(newGraphe) 
+    newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
-
 
     # CONDITION POUR ELAGUER : BORNE SUP < BORNE INF
 
-
-    if not(newBorneSup < newBorneInf) :
-        print("hello")
+    if (not(newBorneSup < newBorneInf) or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
 
-
     # Début de l'algorithme de branchement
-    while (statesToStudy != []) :
+    while (len(statesToStudy) != 0) :
 
         # On récupère la tete de la pile et on la supprime de statesToStudy
         state = statesToStudy.pop(0)
@@ -601,8 +593,7 @@ def branchementBornesCouplage(G) :
             newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
 
-            if not(newBorneSup < newBorneInf) :
-                print("hello")
+            if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
                 statesToStudy.insert(0, [[state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup]])
                 nbNoeudsGeneres += 1
 
@@ -611,12 +602,12 @@ def branchementBornesCouplage(G) :
             newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
 
-            if not(newBorneSup < newBorneInf) :
-                print("hello")
+            if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
                 statesToStudy.insert(0, [[state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup]])
                 nbNoeudsGeneres += 1
         
-    print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
+    if (verbose) :
+        print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
 
     # On retourne C
     return optiC
@@ -703,7 +694,6 @@ print("G = ", G, "\n")
 # Test sur la méthode de branchement
 # print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
 # showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
 
 # print(valeurDegresMax(G))
 # calculBornesInf(G)
@@ -713,5 +703,4 @@ print("G = ", G, "\n")
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
 print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
 showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-
-# print(valeurDegresMax(G))
+print(valeurDegresMax(G))
