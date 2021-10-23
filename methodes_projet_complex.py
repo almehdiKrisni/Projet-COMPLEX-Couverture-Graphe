@@ -494,7 +494,7 @@ def branchement(G, randomSelection=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant de calculer les bornes b1, b2 et b3
-def calculBornesInf(G, verbose=False) :   # a verifier!!!
+def calculBorneInf(G, verbose=False) :   # a verifier!!!
     b1 = 0 # Partie entière supérieure de m / delta (delta = degrès maximum sommets du graphe)
     b2 = 0 # Cardinalité de M (M un couplage de G)
     b3 = 0 # Formule
@@ -536,7 +536,7 @@ def branchementBornesCouplage(G) :
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     # On calcule la borne inférieure et la borne supérieure pour la racine
-    rootBorneInf = calculBornesInf(G)
+    rootBorneInf = calculBorneInf(G)
     rootBorneSup = len(algoCouplage(G))
 
     print("bornes de la racine", rootBorneInf, rootBorneSup)
@@ -556,7 +556,7 @@ def branchementBornesCouplage(G) :
     
     # Création des informations du noeud de gauche
     newGraphe = suppSommet(G, areteInitiale[0])
-    newBorneInf = calculBornesInf(newGraphe)
+    newBorneInf = calculBorneInf(newGraphe)
     newBorneSup = len(algoCouplage(newGraphe))
 
     if (newBorneSup < newBorneInf) :
@@ -565,7 +565,7 @@ def branchementBornesCouplage(G) :
 
     # Création des informations du noeud de droite
     newGraphe = suppSommet(G, areteInitiale[1])
-    newBorneInf = calculBornesInf(newGraphe)
+    newBorneInf = calculBorneInf(newGraphe)
     newBorneSup = len(algoCouplage(newGraphe))
 
     if (newBorneSup < newBorneInf) :
@@ -592,7 +592,7 @@ def branchementBornesCouplage(G) :
 
             # Calcul des informations du noeud de gauche
             newGraphe = suppSommet(grapheEtude, areteGraphe[0])
-            newBorneInf = calculBornesInf(newGraphe)
+            newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
 
             if (newBorneSup < newBorneInf) :
@@ -602,7 +602,7 @@ def branchementBornesCouplage(G) :
 
             # Calcul des informations du noeud de droite
             newGraphe = suppSommet(grapheEtude, areteGraphe[1])
-            newBorneInf = calculBornesInf(newGraphe)
+            newBorneInf = calculBorneInf(newGraphe)
             newBorneSup = algoCouplage(newGraphe)
 
             if (newBorneSup < newBorneInf) :
