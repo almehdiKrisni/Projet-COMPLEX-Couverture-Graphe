@@ -566,34 +566,35 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
     # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
-    
-    # Création des informations du noeud de gauche
-    newGraphe = suppSommet(G, areteInitiale[0])
-    newBorneInf = calculBorneInf(newGraphe) + 1
-    newBorneSup = len(algoCouplage(newGraphe))
-
-    print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "bornes Inf sup =", newBorneInf, newBorneSup )
-
-    if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
-        statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud gauche")
 
     # Création des informations du noeud de droite
-    newGraphe = suppSommet(G, areteInitiale[1])
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
     newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
-
-    print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "bornes Inf sup =", newBorneInf, newBorneSup )
+    print("niveau node droite I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
         print("on ajoute ce noeud droit")
 
-    i = 0
+    # Création des informations du noeud de gauche
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[0])
+    newBorneInf = calculBorneInf(newGraphe) + 1
+    newBorneSup = len(algoCouplage(newGraphe))
+    print("niveau node gauche I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+
+    if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
+        statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
+        print("on ajoute ce noeud gauche")
+
+
     # Début de l'algorithme de branchement
+    i = 0    
     while (len(statesToStudy) != 0) :
         i+=1
-        print("iteration n.", i)
+        print("\niteration n.", i)
 
         # On récupère la tete de la pile et on la supprime de statesToStudy
         state = statesToStudy.pop(0)
@@ -602,12 +603,12 @@ def branchementBornesCouplage(G, verbose=False) :
         if (areteGraphe(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-                print("c est une feuille, plus d aretes dans E, optiC =", optiC)
+                print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
 
-            print("G it.", i, ":", state[1] )
+            print(">>> G it.", i, ":", state[1] )
 
             # On récupère la première arete du branchement
             areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
