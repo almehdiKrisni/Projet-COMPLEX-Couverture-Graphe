@@ -572,7 +572,7 @@ def branchementBornesCouplage(G, verbose=False) :
     newGraphe = suppSommet(newGraphe, areteInitiale[1])
     newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
-    print("niveau node droite I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+    print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
@@ -583,7 +583,7 @@ def branchementBornesCouplage(G, verbose=False) :
     newGraphe = suppSommet(newGraphe, areteInitiale[0])
     newBorneInf = calculBorneInf(newGraphe) + 1
     newBorneSup = len(algoCouplage(newGraphe))
-    print("niveau node gauche I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+    print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if not(newBorneSup < newBorneInf or newBorneInf > len(optiC)) :
         statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
