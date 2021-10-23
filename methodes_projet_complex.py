@@ -559,16 +559,22 @@ def branchementBornesCouplage(G) :
     newBorneInf = calculBornesInf(newGraphe)
     newBorneSup = len(algoCouplage(newGraphe))
 
-    if (newBorneSup < newBorneInf) :
+    print("bornes premier noeud a creer", newBorneInf, newBorneSup)
+
+    if not(newBorneSup < newBorneInf) :
         print("hello")
         statesToStudy.append([[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
 
     # Création des informations du noeud de droite
     newGraphe = suppSommet(G, areteInitiale[1])
-    newBorneInf = calculBornesInf(newGraphe)
+    newBorneInf = calculBornesInf(newGraphe) 
     newBorneSup = len(algoCouplage(newGraphe))
 
-    if (newBorneSup < newBorneInf) :
+
+    # CONDITION POUR ELAGUER : BORNE SUP < BORNE INF
+
+
+    if not(newBorneSup < newBorneInf) :
         print("hello")
         statesToStudy.append([[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
 
@@ -591,21 +597,21 @@ def branchementBornesCouplage(G) :
             grapheEtude = state[1]
 
             # Calcul des informations du noeud de gauche
-            newGraphe = suppSommet(grapheEtude, areteGraphe[0])
+            newGraphe = suppSommet(grapheEtude, areteEtude[0])
             newBorneInf = calculBornesInf(newGraphe)
             newBorneSup = len(algoCouplage(newGraphe))
 
-            if (newBorneSup < newBorneInf) :
+            if not(newBorneSup < newBorneInf) :
                 print("hello")
                 statesToStudy.insert(0, [[state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup]])
                 nbNoeudsGeneres += 1
 
             # Calcul des informations du noeud de droite
-            newGraphe = suppSommet(grapheEtude, areteGraphe[1])
+            newGraphe = suppSommet(grapheEtude, areteEtude[1])
             newBorneInf = calculBornesInf(newGraphe)
-            newBorneSup = algoCouplage(newGraphe)
+            newBorneSup = len(algoCouplage(newGraphe))
 
-            if (newBorneSup < newBorneInf) :
+            if not(newBorneSup < newBorneInf) :
                 print("hello")
                 statesToStudy.insert(0, [[state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup]])
                 nbNoeudsGeneres += 1
