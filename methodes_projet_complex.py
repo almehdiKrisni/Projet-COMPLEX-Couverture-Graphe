@@ -294,7 +294,7 @@ def plotRapportApproximation(nMax, p, mode, verbose = False, save = False):
             print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
             return
 
-        opt = len(branchementOptimiseCouplage_uDegreMax(G))
+        opt = len(branchement(G))
 
         if opt != 0 :
             r = res/opt
@@ -309,7 +309,10 @@ def plotRapportApproximation(nMax, p, mode, verbose = False, save = False):
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.title("Rapport d'approximation des algorithmes algoCouplage et algoGlouton en f(n) avec nMax = " + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 10)
+    if (mode == 1) :
+        plt.title("Rapport d'approximation de l'algorithme algoCouplage en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    if (mode == 2) :
+        plt.title("Rapport d'approximation de l'algorithme algoGlouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé
@@ -1407,5 +1410,6 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Evalutation du rapport d'approximation (question 4.4.1)
-plotRapportApproximation(15, 0.5, 1, verbose = True, save = False)
+# plotRapportApproximation(20, 0.5, 1, verbose = True, save = False) # algoCouplage
+# plotRapportApproximation(20, 0.5, 2, verbose = True, save = False) # algoGlouton
 # print("\n----------------------------------------------------------------------------------------\n")
