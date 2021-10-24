@@ -293,21 +293,56 @@ def plotPerformancesGlouton(p, nbIterations, secondesMaxAutorises, verbose = Fal
 #-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme algoGlouton
-def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
+def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = False, save = False):
     """ p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
-        nbIterations : nombre d'éxecutions de l'algorithme algoGlouton, dans le but d'en déduir une performance moyenne
-        secondesMaxAutorises : temps maximum autorisé pour l'éxecution de l'algorithme algoGlouton
-        mode = 
+        nbIterations : nombre d'éxecutions de l'algorithme, dans le but d'en déduir une performance moyenne
+        secondesMaxAutorises : temps maximum autorisé pour l'éxecution de l'algorithme
+        nbNoeuds : nombre de nodes allant etre créées au maximum dans le graphe
+        mode : valeur déterminant l'algorithme allant etre utilisé
         verbose : "True" pour afficher le détail des itérations
         save : "True" pour enregistrer le tracé en format jpg
     """
 
+    # Calcul de la taille nMaxAGlouton pour l'algorithme algoGlouton(G)
+    # nMaxAGlouton : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
+    nMax = 0
+    t = 0
+    while t < secondesMaxAutorises :
+        nMax += 1
+        
+        # Méthode permettant de générer des graphes aléatoires
+        G = randomGraphe(nMax, p)
+
+        t1 = time.time()
+
+        # Selection du mode (algorithme allant etre utilisé)
+        if (mode == 1) :
+            res = algoCouplage(G)
+        elif (mode == 2) :
+            res = algoGlouton(G)
+        elif (mode == 3) :
+            res = branchement(G)
+        elif (mode == 4) :
+            res = branchementBornesCouplage(G)
+        elif (mode == 5) :
+            res = branchementOptimiseCouplage(G)
+        elif (mode == 6) :
+            res = branchementOptimiseCouplage_uDegreMax(G)
+        else :
+            print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+            return
+
+        t2 = time.time()
+        t = t2-t1
+
+    if verbose :
+        print("nMax = ", nMax, "\n")
 
     y1 = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme sélectionné(G)
     y2 = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme sélectionné(G)
     x = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
     
-    # Pour chaque 1/10 de nMaxAGlouton
+    # Pour chaque 1/10 de nMax
     for i in range(1, 11) :
 
         tabTemps = []
@@ -319,7 +354,7 @@ def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
         for ite in range(nbIterations):
 
             # Méthode permettant de générer des graphes aléatoires
-            G = randomGraphe(int(nbIterations * i / 10), p)
+            G = randomGraphe(int(nMax * (i / 10)), p)
 
             # Execution et recueil statistiques de l'algorithme (G)
             t1 = time.time()
@@ -327,22 +362,16 @@ def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
             # Selection du mode (algorithme allant etre utilisé)
             if (mode == 1) :
                 res = algoCouplage(G)
-                nomAlgo = "algo_Couplage"
             elif (mode == 2) :
                 res = algoGlouton(G)
-                nomAlgo = "algo_Glouton"
             elif (mode == 3) :
                 res = branchement(G)
-                nomAlgo = "branchement"
             elif (mode == 4) :
                 res = branchementBornesCouplage(G)
-                nomAlgo = "branchement_Bornes_Couplage"
             elif (mode == 5) :
                 res = branchementOptimiseCouplage(G)
-                nomAlgo = "branchement_Optimise_Couplage"
             elif (mode == 6) :
                 res = branchementOptimiseCouplage_uDegreMax(G)
-                nomAlgo = "branchement_Optimise_Couplage_uDegreMax"
             else :
                 print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
                 return
@@ -358,16 +387,32 @@ def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
 
         # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
         moyTemps = sum(tabTemps)/len(tabTemps)
-        moyQualite = int(sum(resAlgo)/len(resAlgo))
+        moyQualiteSolutions = int(sum(resAlgo)/len(resAlgo))
 
         y1.append(moyTemps)
         y2.append(moyQualiteSolutions)
-        x.append(int(nbIterations * i/10))
+        x.append(int(nMax * (i / 10)))
 
         if verbose : 
             print("\nx = ", i, "/10 nMax (" + str(int(nbIterations * i/10)) + ") : moyTemps =", moyTemps, "moyQualiteSolutions =", moyQualiteSolutions)
             print("----------------------------------------------------------------------------------------------\n")
 
+    # Selection du nom de l'algorithme
+    if (mode == 1) :
+        nomAlgo = "algo_Couplage"
+    elif (mode == 2) :
+        nomAlgo = "algo_Glouton"
+    elif (mode == 3) :
+        nomAlgo = "branchement"
+    elif (mode == 4) :
+        nomAlgo = "branchement_Bornes_Couplage"
+    elif (mode == 5) :
+        nomAlgo = "branchement_Optimise_Couplage"
+    elif (mode == 6) :
+        nomAlgo = "branchement_Optimise_Couplage_uDegreMax"
+    else :
+        print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+        return
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
@@ -389,8 +434,8 @@ def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
     plt.plot(x, y2, color = 'green')
 
     # Sauvegarde du tracé
-    if save != None:
-        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + ".jpeg", transparent = True)
+    if (save) :
+        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
 
     plt.show()
 
@@ -1228,5 +1273,5 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------
 
-
+plotPerformances(0.2, 10, 0.05, 1, save=True)
 
