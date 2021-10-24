@@ -676,14 +676,19 @@ def branchementOptimiseCouplage(G, verbose=False) :
         print("Solution optimale de la racine :", optiC)
         print("Arete à traiter :", areteInitiale)
 
-    
+
     # Création des informations du noeud de droite
     newGraphe = copy.deepcopy(G)
-    voisinsU = newGraphe[areteInitiale[0]]
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
 
-    for s in voisinsU:
-        newGraphe = suppSommet(newGraphe, s)
-    
+    if not newGraphe == {}:
+        voisinsU = newGraphe[areteInitiale[0]]
+        for s in voisinsU:
+            if s in newGraphe:
+                newGraphe = suppSommet(newGraphe, s)
+    else :
+        voisinsU = None
+
     if not (newGraphe == {}):
         newBorneInf = calculBorneInf(newGraphe) + 1
         newBorneSup = len(algoCouplage(newGraphe))
@@ -692,8 +697,11 @@ def branchementOptimiseCouplage(G, verbose=False) :
         newBorneSup = None
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-        statesToStudy.insert(0, [[areteInitiale[1]] + voisinsU, newGraphe, newBorneInf, newBorneSup])
-        nbNoeudsGeneres += 1
+        if voisinsU != None:
+            statesToStudy.insert(0, [[[areteInitiale[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+        else:
+            statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
+        nbNoeudsGeneres += 1 
 
     if verbose :
         print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
@@ -748,10 +756,15 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
-            voisinsU = newGraphe[areteEtude[0]]
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
 
-            for s in voisinsU:
-                newGraphe = suppSommet(newGraphe, s)
+            if not newGraphe == {}:
+                voisinsU = newGraphe[areteEtude[0]]
+                for s in voisinsU:
+                    if s in newGraphe:
+                        newGraphe = suppSommet(newGraphe, s)
+            else :
+                voisinsU = None
 
             if not (newGraphe == {}):
                 newBorneInf = calculBorneInf(newGraphe)
@@ -761,8 +774,11 @@ def branchementOptimiseCouplage(G, verbose=False) :
                 newBorneSup = None
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-                statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
-                nbNoeudsGeneres += 1
+                if voisinsU != None:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+                else:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]]], newGraphe, newBorneInf, newBorneSup])
+                nbNoeudsGeneres += 1    
 
                 if verbose :
                     print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
@@ -771,6 +787,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
                     print("\t\tBorne inferieure =", newBorneInf)
                     print("\t\tBorne superieure =", newBorneSup)
                     print("\n")
+
 
             # Calcul des informations du noeud de gauche
             newGraphe = copy.deepcopy(state[1])
@@ -987,115 +1004,8 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     # On retourne la meilleure couverture trouvée
     return optiC
 
-#######################################################################################################
-# TESTS
-#######################################################################################################
 
-# Instanciation d'un graphe G (modelisation : dictionnaire)
-# G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
-# showGraphe(convertGraph(G))
 
-# Instanciation d'un graphe G (modelisation : librairie graphe networkx)
-# V = [0, 1, 2, 3]
-# E = [(0,1), (0,2), (0,3), (1,2)]
-
-# G = nx.Graph()
-# G.add_nodes_from(V) # sommets
-# G.add_edges_from(E) # aretes
-# showGraphe(G)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test méthode suppSommet
-# print("Graphe G\n", G, "\n")
-# newG = suppSommet(G, 0)
-# print("Graphe G'\n", newG, "\n")
-
-#------------------------------------------------------------------------------------------------------
-
-# Test méthode multSuppSommet
-# newG = multSuppSommet(G, [0, 1])
-# print("Graphe G'\n", newG, "\n")
-
-#------------------------------------------------------------------------------------------------------
-
-# Tests des méthodes degresSommet et sommetDegresSommet
-# print(degresSommet(G))
-# print(sommetDegresMax(G))
-
-#------------------------------------------------------------------------------------------------------
-
-# Tests sur la génération aléatoire de graphe
-# randG = randomGraphe(8, 0.1)
-# print("Graphe G\n", randG, "\n")
-# showGraphe(convertGraph(randG))
-
-#------------------------------------------------------------------------------------------------------
-
-# Tests sur l'algorithme de couplage
-# G = randomGraphe(8, 0.2)
-# print(algoCouplage(G))
-# print(aretesGrapheToList(G))
-# showGraphe(convertGraph(G))
-
-#------------------------------------------------------------------------------------------------------
-
-# Tests sur l'algorithme de couplage glouton
-# G = randomGraphe(20, 0.5)
-# print(algoGlouton(G))
-# showGraphe(convertGraph(G))
-
-#------------------------------------------------------------------------------------------------------
-
-# Tests de comparaison d'efficacité des 2 algorithmes
-
-#------------------------------------------------------------------------------------------------------
-
-# Test méthode acquisitionGraphe depuis un fichier texte
-G = acquisitionGraphe("exempleinstance.txt")
-print("G = ", G, "\n")
-showGraphe(G)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test méthodes plotPerformances sur Couplage et Glouton
-# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
-# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-
-# print(valeurDegresMax(G))
-# calculBornesInf(G)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-# print(valeurDegresMax(G))
-
-#------------------------------------------------------------------------------------------------------
-
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
-#showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-
-#------------------------------------------------------------------------------------------------------
-# print("--------------------------------------------------------")
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
 
 #######################################################################################################
@@ -1133,7 +1043,128 @@ def evaluationAlgorithm(n, p, a) :
     else :
         print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
 
-#------------------------------------------------------------------------------------------
+
+
+
+
+#######################################################################################################
+# TESTS
+#######################################################################################################
+
+# Instanciation d'un graphe G (modelisation : dictionnaire)
+# G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
+# showGraphe(G)
+
+# Instanciation d'un graphe G (modelisation : librairie graphe networkx)
+# V = [0, 1, 2, 3]
+# E = [(0,1), (0,2), (0,3), (1,2)]
+
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode suppSommet
+# print("Graphe G\n", G, "\n")
+# newG = suppSommet(G, 0)
+# print("Graphe G'\n", newG, "\n")
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode multSuppSommet
+# newG = multSuppSommet(G, [0, 1])
+# print("Graphe G'\n", newG, "\n")
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests des méthodes degresSommet et sommetDegresSommet
+# print(degresSommet(G))
+# print(sommetDegresMax(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur la génération aléatoire de graphe
+# G = randomGraphe(8, 0.1)
+# print("Graphe G = ", G, "\n")
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage
+# G = randomGraphe(8, 0.2)
+# print(algoCouplage(G))
+# print(aretesGrapheToList(G))
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage glouton
+# G = randomGraphe(20, 0.5)
+# print(algoGlouton(G))
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode acquisitionGraphe depuis un fichier texte
+G = acquisitionGraphe("exempleinstance.txt")
+print("G = ", G, "\n")
+showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthodes plotPerformances sur Couplage et Glouton
+# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
+# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement
+# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+
+# print("ValeurDegresMax = ", valeurDegresMax(G))
+# print("calculBornesInf =", calculBornesInf(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
+# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print(valeurDegresMax(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
 
 # Evalutation de branchement (question 4.1)
 # n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
@@ -1141,3 +1172,4 @@ def evaluationAlgorithm(n, p, a) :
 # for i in range(d) :
 #     numberOfNodes = (int)(n * ((i + 1) / d))
 #     evaluationAlgorithm(numberOfNodes, 0.2, 1)
+# print("\n----------------------------------------------------------------------------------------\n")
