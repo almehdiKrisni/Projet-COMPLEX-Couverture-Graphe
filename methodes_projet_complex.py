@@ -150,6 +150,9 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         moyTemps = 0
         resAlgo = []
         moyQualiteSolutions = 0
+        tabNoeudsGeneneres = []
+        moyNbNoeudsGeneres = 0
+        
 
         # Pour chacune des nbIterations démandées en paramètre
         for ite in range(nbIterations):
@@ -159,6 +162,8 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
             # Execution et recueil statistiques de l'algorithme (G)
             t1 = time.time()
+
+            # Variable res et noeud permettant de stocker le résultat de l'algorithme et le nombre de noeuds générés
             
             # Selection du mode (algorithme allant etre utilisé)
             if (mode == 1) :
@@ -528,7 +533,7 @@ def branchement(G, randomSelection=False, verbose=False) :
         print("Couverture optimale retournée par la méthode 'branchement' :", optiC)
 
     # On retourne la meilleure couverture trouvée
-    return optiC
+    return (optiC, nbNoeudsGeneres)
 
 #------------------------------------------------------------------------------------------------------
 
@@ -729,7 +734,7 @@ def branchementBornesCouplage(G, verbose=False) :
         print("Couverture optimale retournée par la méthode 'branchementBornesCouplage' :", optiC)
 
     # On retourne la meilleure couverture trouvée
-    return optiC
+    return (optiC, nbNoeudsGeneres)
 
 #------------------------------------------------------------------------------------------------------
 
@@ -909,7 +914,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
         print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage' :", optiC)
 
     # On retourne la meilleure couverture trouvée
-    return optiC
+    return (optiC, nbNoeudsGeneres)
 
 #------------------------------------------------------------------------------------------------------
 
@@ -1097,7 +1102,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
 
     # On retourne la meilleure couverture trouvée
-    return optiC
+    return (optiC, nbNoeudsGeneres)
 
 
 
@@ -1219,14 +1224,8 @@ showGraphe(G)
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformances sur Couplage et Glouton
-<<<<<<< HEAD
 plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
 plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
-=======
-# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
-# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
-# print("\n----------------------------------------------------------------------------------------\n")
->>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
 
 #------------------------------------------------------------------------------------------------------
 
@@ -1241,17 +1240,10 @@ plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-<<<<<<< HEAD
 # plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
 # plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
 # plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
 # plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
-=======
-# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
-# print("\n----------------------------------------------------------------------------------------\n")
->>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
 
 #------------------------------------------------------------------------------------------------------
 
