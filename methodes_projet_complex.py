@@ -457,13 +457,13 @@ def algoGlouton(G) :
 
 # Méthode réalisant le branchement de manière impartiale (sans indice)
 def branchement(G, randomSelection=False, verbose=False) :
-    nbNoeudsGeneres = 0 # nombre de noeuds générés
+    nbNoeudsGeneres = 1 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
     if (areteGraphe(G) != []) :
         areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe si elle existe
     else :
-        return optiC # Sinon on renvoie l'ensemble des nodes de G
+        return [n for n in G.keys()] # Sinon on renvoie l'ensemble des nodes de G
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G ]
     statesToStudy = [] # Pile des états du branchement à étudier
@@ -1081,7 +1081,7 @@ def evaluationAlgorithm(n, p, a) :
         print("EVALUATION - Algorithme : branchement (4.1).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
         testGraphe = randomGraphe(n,p)
         startTime = time.time()
-        solution = branchement(testGraphe)
+        solution = branchement(testGraphe, verbose=True)
         endTime = time.time()
         execTime = endTime - startTime
         print("Temps d'exécution =", execTime, "secondes.\n")
@@ -1101,9 +1101,9 @@ def evaluationAlgorithm(n, p, a) :
         print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
 
 # Evalutation de branchement (question 4.1)
-n = 100 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
-d = 10 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
+n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
+d = 5 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
 for i in range(d) :
     numberOfNodes = (int)(n * ((i + 1) / d))
-    evaluationAlgorithm(numberOfNodes, 0.2, 2)
+    evaluationAlgorithm(numberOfNodes, 1 / math.sqrt(numberOfNodes), 1)
 
