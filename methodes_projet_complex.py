@@ -290,6 +290,109 @@ def plotPerformancesGlouton(p, nbIterations, secondesMaxAutorises, verbose = Fal
 
     plt.show()
 
+#-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme algoGlouton
+def plotPerformances(p, nbIterations, mode, verbose = False, save = False):
+    """ p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
+        nbIterations : nombre d'éxecutions de l'algorithme algoGlouton, dans le but d'en déduir une performance moyenne
+        secondesMaxAutorises : temps maximum autorisé pour l'éxecution de l'algorithme algoGlouton
+        mode = 
+        verbose : "True" pour afficher le détail des itérations
+        save : "True" pour enregistrer le tracé en format jpg
+    """
+
+
+    y1 = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme sélectionné(G)
+    y2 = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme sélectionné(G)
+    x = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
+    
+    # Pour chaque 1/10 de nMaxAGlouton
+    for i in range(1, 11) :
+
+        tabTemps = []
+        moyTemps = 0
+        resAlgo = []
+        moyQualiteSolutions = 0
+
+        # Pour chacune des nbIterations démandées en paramètre
+        for ite in range(nbIterations):
+
+            # Méthode permettant de générer des graphes aléatoires
+            G = randomGraphe(int(nbIterations * i / 10), p)
+
+            # Execution et recueil statistiques de l'algorithme (G)
+            t1 = time.time()
+            
+            # Selection du mode (algorithme allant etre utilisé)
+            if (mode == 1) :
+                res = algoCouplage(G)
+                nomAlgo = "algo_Couplage"
+            elif (mode == 2) :
+                res = algoGlouton(G)
+                nomAlgo = "algo_Glouton"
+            elif (mode == 3) :
+                res = branchement(G)
+                nomAlgo = "branchement"
+            elif (mode == 4) :
+                res = branchementBornesCouplage(G)
+                nomAlgo = "branchement_Bornes_Couplage"
+            elif (mode == 5) :
+                res = branchementOptimiseCouplage(G)
+                nomAlgo = "branchement_Optimise_Couplage"
+            elif (mode == 6) :
+                res = branchementOptimiseCouplage_uDegreMax(G)
+                nomAlgo = "branchement_Optimise_Couplage_uDegreMax"
+            else :
+                print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+                return
+
+            t2 = time.time()
+            t = t2-t1
+
+            tabTemps.append(t) # temps de calcul de l'algorithme pour l'itération courante
+            resAlgo.append(len(res)) # qualité des solutions pour l'itération courante
+
+            if verbose : 
+                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTemps =", tabTemps, "\n\t\tresAlgo =", resAlgo, "\n")
+
+        # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
+        moyTemps = sum(tabTemps)/len(tabTemps)
+        moyQualite = int(sum(resAlgo)/len(resAlgo))
+
+        y1.append(moyTemps)
+        y2.append(moyQualiteSolutions)
+        x.append(int(nbIterations * i/10))
+
+        if verbose : 
+            print("\nx = ", i, "/10 nMax (" + str(int(nbIterations * i/10)) + ") : moyTemps =", moyTemps, "moyQualiteSolutions =", moyQualiteSolutions)
+            print("----------------------------------------------------------------------------------------------\n")
+
+
+    # Affichage graphique
+    plt.figure(figsize = (10, 10))
+    plt.suptitle("Performances de l'algorithme " + nomAlgo + "\n", color = 'red', size = 15)
+    plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
+
+    # Construction et affichage du tracé "temps de calcul"
+    plt.subplot(2, 1, 1)
+    plt.title("Analyse du temps de calcul en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("t(n)") # temps de calcul en fonction du nombre de sommets du graphe G
+    plt.plot(x, y1, color = 'blue')
+
+    # Construction et affichage du tracé "qualité des solutions"
+    plt.subplot(2, 1, 2)
+    plt.title("Analyse de la qualité des solutions en fonction du nombre de sommets n")
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
+    plt.plot(x, y2, color = 'green')
+
+    # Sauvegarde du tracé
+    if save != None:
+        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + ".jpeg", transparent = True)
+
+    plt.show()
 
 
 
@@ -1100,10 +1203,16 @@ def evaluationAlgorithm(n, p, a) :
     else :
         print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
 
+#------------------------------------------------------------------------------------------
+
 # Evalutation de branchement (question 4.1)
-n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
-d = 20 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
-for i in range(d) :
-    numberOfNodes = (int)(n * ((i + 1) / d))
-    evaluationAlgorithm(numberOfNodes, 0.2, 1)
+# n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
+# d = 20 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
+# for i in range(d) :
+#     numberOfNodes = (int)(n * ((i + 1) / d))
+#     evaluationAlgorithm(numberOfNodes, 0.2, 1)
+
+#------------------------------------------------------------------------------------------
+
+
 
