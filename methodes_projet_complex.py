@@ -948,14 +948,20 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 
     # Création des informations du noeud de droite
     newGraphe = copy.deepcopy(G)
+    print("G init :", newGraphe)
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
+    print("G modif1 :", newGraphe)
 
-    voisinsU = newGraphe[areteInitiale[0]]
-    print("voisinsU", voisinsU)
+    if not newGraphe == {}:
+        voisinsU = newGraphe[areteInitiale[0]]
+        print("voisinsU", voisinsU)
+        for s in voisinsU:
+            print("on enleve le voisin de u ", s)
+            if s in newGraphe:
+                newGraphe = suppSommet(newGraphe, s)
+    else :
+        voisinsU = None
 
-    newGraphe = suppSommet(newGraphe, areteInitiale[0])
-    for s in voisinsU:
-        newGraphe = suppSommet(newGraphe, s)
-    
     if not (newGraphe == {}):
         newBorneInf = calculBorneInf(newGraphe) + 1
         newBorneSup = len(algoCouplage(newGraphe))
@@ -965,8 +971,12 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-        statesToStudy.insert(0, [[areteInitiale[1]] + voisinsU, newGraphe, newBorneInf, newBorneSup])
+        if voisinsU != None:
+            statesToStudy.insert(0, [[[areteInitiale[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+        else:
+            statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
         print("on ajoute ce noeud droit, c =", statesToStudy[0][0])
+
 
     # Création des informations du noeud de gauche
     newGraphe = copy.deepcopy(G)
@@ -1006,39 +1016,43 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
             print(">>> G it.", i, ":", state[1] )
 
             # On récupère la première arete du branchement
-            uDegreMax = sommetDegresMax(G)
+            uDegreMax = sommetDegresMax(state[1])
             Gprime = {}
-            Gprime[uDegreMax] = G[uDegreMax]
+            Gprime[uDegreMax] = (state[1])[uDegreMax]
             areteEtude = areteGraphe(Gprime)[0] # On récupère la  arete du graphe avec max d
             print("areteEtude", areteEtude)
 
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
-            print("qua", newGraphe)
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
+            print("G modif sans v =", areteEtude[1], "G =", newGraphe)
 
-
-
-            voisinsU = newGraphe[areteInitiale[0]]
-            print("voisinsU", voisinsU)
-
-            voisinsU = newGraphe[areteEtude[0]]
-            print("voisinsU", voisinsU)
-            print("qui")
-            for s in voisinsU:
-                newGraphe = suppSommet(newGraphe, s)
-
+            if not newGraphe == {}:
+                voisinsU = newGraphe[areteEtude[0]]
+                print("voisinsU", voisinsU)
+                for s in voisinsU:
+                    print("on enleve le voisin de u ", s)
+                    if s in newGraphe:
+                        newGraphe = suppSommet(newGraphe, s)
+                print("G modif2 :", newGraphe)
+            else :
+                voisinsU = None
+ 
             if not (newGraphe == {}):
-                newBorneInf = calculBorneInf(newGraphe)
+                newBorneInf = calculBorneInf(newGraphe) + 1
                 newBorneSup = len(algoCouplage(newGraphe))
             else :
                 newBorneInf = None
                 newBorneSup = None
-            print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+            print("niveau node droite I : arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-                statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
-                nbNoeudsGeneres += 1
-                print("on ajoute ce noeud droit")
+                if voisinsU != None:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+                else:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]]], newGraphe, newBorneInf, newBorneSup])
+                print("on ajoute ce noeud droit, c =", statesToStudy[0][0])
+
 
             # Calcul des informations du noeud de gauche
             newGraphe = copy.deepcopy(state[1])
@@ -1158,13 +1172,13 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
+print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
 #showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
 #------------------------------------------------------------------------------------------------------
-
+print("--------------------------------------------------------")
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
+print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
 # showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
 
