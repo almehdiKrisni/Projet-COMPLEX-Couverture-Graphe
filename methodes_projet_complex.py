@@ -231,7 +231,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 10)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé "temps de calcul"
@@ -617,6 +617,7 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
     if (aretesGrapheToList(G) == []) :
+        print("exception", [s for s in G.keys()], nbNoeudsGeneres)
         return [s for s in G.keys()], nbNoeudsGeneres
 
     # On calcule la borne inférieure et la borne supérieure pour la racine
@@ -625,7 +626,7 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # Dans le cas où les deux bornes sont égales, on retourne immédiatement la solution
     if (rootBorneInf >= rootBorneSup) :
-        return algoCouplage(G)
+        return algoCouplage(G), nbNoeudsGeneres
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
@@ -791,7 +792,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
     # Dans le cas où les deux bornes sont égales, on retourne immédiatement la solution
     if (rootBorneInf >= rootBorneSup) :
-        return algoCouplage(G)
+        return algoCouplage(G), nbNoeudsGeneres
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
@@ -984,7 +985,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     if (rootBorneInf >= rootBorneSup) :
         if verbose :
             print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
-        return optiC
+        return optiC, nbNoeudsGeneres
 
     #  On récupère la premiere arete du graphe
     uDegreMax = sommetDegresMax(G)
@@ -1275,7 +1276,7 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances sur les algorithmes de branchement
+# Test méthode plotPerformances sur l'algorithme de branchement simple
 # plotPerformances(0.2, 15, 2.5, 3, verbose=True, save=True)
 # plotPerformances(0.5, 15, 2.5, 3, verbose=True, save=True)
 # plotPerformances(0.9, 15, 2.5, 3, verbose=True, save=True)
@@ -1284,18 +1285,16 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances sur les algorithmes de branchement
-plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
-plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
-plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
+# Test méthode plotPerformances sur les algorithmes de branchement bornesCouplage
+# plotPerformances(0.3, 1, 1, 4, verbose=True, save=True)
+# plotPerformances(0.7, 5, 1, 4, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances sur l
-plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
-plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
-plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
+# Test méthode plotPerformances sur l'algorithme de branchement 
+plotPerformances(0.3, 5, 1, 5, verbose=True, save=True)
+plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
