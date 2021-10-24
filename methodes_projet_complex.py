@@ -264,10 +264,11 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher le rapport d'approximation de algoCouplage et algoGlouton
-def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = False):
+def plotRapportApproximation(nMax, p, nbIterations, mode, verbose = False, save = False):
     """ nMax : nombre de noeuds maximale pour le graphe
         p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
         nbIterations : nombre d'éxecutions de l'algorithme, dans le but d'en déduir une performance moyenne
+        mode : valeur déterminant l'algorithme allant etre utilisé, 1 = algoCouplage ; 2 = algoGlouton
         verbose : "True" pour afficher le détail des itérations
         save : "True" pour enregistrer le tracé en format jpg
     """
@@ -282,20 +283,30 @@ def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = Fals
         # Pour chacune des nbIterations démandées en paramètre
         for ite in range(nbIterations):
             r = -1
+            res = -1
 
             # Méthode permettant de générer des graphes aléatoires
             G = randomGraphe(int(nMax * (i / 10)), p)
-            resAC = len(algoCouplage(G))
-            resAG = len(algoGlouton(G))
 
-            if resAC != 0:
-                r = resAG/resAC
+            # Calcul du rapport d'approximation r
+            # mode : 1 = algoCouplage ; 2 = algoGlouton
+            if (mode == 1) :
+                res = len(algoCouplage(G))
+            elif (mode == 2) :
+                res = len(algoGlouton(G))
+            else :
+                print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+                return
+
+            opt = len(branchement(G))
+
+            if opt != 0 :
+                r = res/opt
                 tabRappApprox.append(r)
 
             if verbose : 
                 print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\tRapport d'approximation :", r, "\n")
 
-        # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
         if len(tabRappApprox) != 0 :
             moyR = sum(tabRappApprox)/len(tabRappApprox)
         else :
@@ -1408,5 +1419,5 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Evalutation du rapport d'approximation (question 4.4.1)
-plotRapportApproximation(10, 0.5, 10, verbose = False, save = False)
+plotRapportApproximation(10, 0.5, 10, 1, verbose = False, save = False)
 # print("\n----------------------------------------------------------------------------------------\n")
