@@ -909,6 +909,12 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
             print("qua", newGraphe)
+
+
+
+            voisinsU = newGraphe[areteInitiale[0]]
+            print("voisinsU", voisinsU)
+
             voisinsU = newGraphe[areteEtude[0]]
             print("voisinsU", voisinsU)
             print("qui")
@@ -1053,4 +1059,4 @@ print("G = ", G, "\n")
 
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
 print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
-#showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
