@@ -1102,8 +1102,8 @@ def evaluationAlgorithm(n, p, a) :
 
 # Evalutation de branchement (question 4.1)
 n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
-d = 5 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
+d = 20 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
 for i in range(d) :
     numberOfNodes = (int)(n * ((i + 1) / d))
-    evaluationAlgorithm(numberOfNodes, 1 / math.sqrt(numberOfNodes), 1)
+    evaluationAlgorithm(numberOfNodes, 0.2, 1)
 
