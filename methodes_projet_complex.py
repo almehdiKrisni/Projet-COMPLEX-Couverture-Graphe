@@ -219,7 +219,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe\n", color = 'red', size = 15)
+    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'red', size = 15)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé "temps de calcul"
@@ -238,7 +238,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Sauvegarde du tracé
     if (save) :
-        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
+        plt.savefig("TestResults/" + nomAlgo + "_p=" + str(p) + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
 
     plt.show()
 
@@ -998,8 +998,8 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformances sur Couplage et Glouton
-# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
-# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
+plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
+plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
 
 #------------------------------------------------------------------------------------------------------
 
@@ -1013,9 +1013,10 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
 
 #------------------------------------------------------------------------------------------------------
 
