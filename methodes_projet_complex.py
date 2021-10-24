@@ -219,7 +219,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.suptitle("Performances de l'algorithme " + nomAlgo + "\n", color = 'red', size = 15)
+    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe\n", color = 'red', size = 15)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé "temps de calcul"
@@ -997,9 +997,9 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-# plotPerformancesCouplage(0.3, 15, 0.01, verbose=True, save=True)
-# plotPerformancesGlouton(0.3, 15, 0.001, verbose=True, save=False)
+# Test méthodes plotPerformances sur Couplage et Glouton
+# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
+# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
 
 #------------------------------------------------------------------------------------------------------
 
@@ -1012,6 +1012,13 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 
 #------------------------------------------------------------------------------------------------------
 
+# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
+# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
+
+#------------------------------------------------------------------------------------------------------
+
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
 # print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
 # showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
@@ -1020,13 +1027,13 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
+# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
 #showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
 #------------------------------------------------------------------------------------------------------
-print("--------------------------------------------------------")
+# print("--------------------------------------------------------")
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
+# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
 # showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
 
@@ -1073,8 +1080,3 @@ def evaluationAlgorithm(n, p, a) :
 # for i in range(d) :
 #     numberOfNodes = (int)(n * ((i + 1) / d))
 #     evaluationAlgorithm(numberOfNodes, 0.2, 1)
-
-#------------------------------------------------------------------------------------------
-
-plotPerformances(0.2, 10, 0.05, 1, save=True)
-
