@@ -639,10 +639,15 @@ def branchementBornesCouplage(G, verbose=False) :
 
 
     if (verbose) :
-        print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
+        print("Nombre de noeuds générés avec la méthode 'branchementBornesCouplage' :", nbNoeudsGeneres)
 
     # On retourne C
     return optiC
+
+#------------------------------------------------------------------------------------------------------
+
+def ameliorationBranchement(G, verbose=False) :
+    pass
 
 
 
