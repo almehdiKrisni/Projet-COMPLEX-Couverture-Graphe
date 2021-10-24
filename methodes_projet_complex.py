@@ -261,6 +261,83 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     plt.show()
 
+#------------------------------------------------------------------------------------------------------
+
+# Méthode permettant d'afficher le rapport d'approximation de algoCouplage et algoGlouton
+def plotRapportApproximation(nMax, p, nbIterations, mode, verbose = False, save = False):
+    """ nMax : nombre de noeuds maximale pour le graphe
+        p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
+        nbIterations : nombre d'éxecutions de l'algorithme, dans le but d'en déduir une performance moyenne
+        mode : valeur déterminant l'algorithme allant etre utilisé, 1 = algoCouplage ; 2 = algoGlouton
+        verbose : "True" pour afficher le détail des itérations
+        save : "True" pour enregistrer le tracé en format jpg
+    """
+    y = []   # axe des ordonnées : rapport d'approximation des algorithmes couplage et glouton
+    x = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
+    
+    # Pour chaque 1/10 de nMax
+    for i in range(1, 11) :
+
+        tabRappApprox = []
+        
+        # Pour chacune des nbIterations démandées en paramètre
+        for ite in range(nbIterations):
+            r = -1
+            res = -1
+
+            # Méthode permettant de générer des graphes aléatoires
+            G = randomGraphe(int(nMax * (i / 10)), p)
+
+            # Calcul du rapport d'approximation r
+            # mode : 1 = algoCouplage ; 2 = algoGlouton
+            if (mode == 1) :
+                res = len(algoCouplage(G))
+            elif (mode == 2) :
+                res = len(algoGlouton(G))
+            else :
+                print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+                return
+
+            opt = len(branchement(G))
+
+            if opt != 0 :
+                r = res/opt
+                tabRappApprox.append(r)
+
+            if verbose : 
+                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\tRapport d'approximation :", r, "\n")
+
+        if len(tabRappApprox) != 0 :
+            moyR = sum(tabRappApprox)/len(tabRappApprox)
+        else :
+            moyR = -1
+        
+        y.append(moyR)
+        x.append(int(nMax * (i / 10)))
+
+        if verbose : 
+            print("\nx = ", i, "/10 nMax (" + str(int(nbIterations * i/10)) + ")\n\t\tRapport d'approximation :", r, "\n")
+            print("----------------------------------------------------------------------------------------------\n")
+
+
+    # Affichage graphique
+    plt.figure(figsize = (10, 10))
+    plt.title("Rapport d'approximation des algorithmes algoCouplage et algoGlouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
+
+    # Construction et affichage du tracé
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("r") # rapport d'approximation
+    plt.axis([0, nMax, 0, r+1])
+    plt.plot(x, y, color = 'blue')
+
+    # Sauvegarde du tracé
+    if (save) :
+        plt.savefig("TestResults/rapportApproximation_p=" + str(p) + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
+
+    plt.show()
+
+
 
 
 
@@ -1285,16 +1362,30 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 # Test méthode plotPerformances sur les algorithmes de branchement bornesCouplage
 # plotPerformances(0.3, 1, 1, 4, verbose=True, save=True)
 # plotPerformances(0.7, 5, 1, 4, verbose=True, save=True)
+=======
+# Test méthode plotPerformances sur les algorithmes de branchement
+# plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
+>>>>>>> d643abbd18373657552e6259bc99864922a7ee77
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 # Test méthode plotPerformances sur l'algorithme de branchement 
 plotPerformances(0.3, 5, 1, 5, verbose=True, save=True)
 plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
+=======
+# Test méthode plotPerformances sur l
+# plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
+>>>>>>> d643abbd18373657552e6259bc99864922a7ee77
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1336,4 +1427,10 @@ plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
 # for i in range(d) :
 #     numberOfNodes = (int)(n * ((i + 1) / d))
 #     evaluationAlgorithm(numberOfNodes, 0.2, 1)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Evalutation du rapport d'approximation (question 4.4.1)
+plotRapportApproximation(10, 0.5, 10, 1, verbose = False, save = False)
 # print("\n----------------------------------------------------------------------------------------\n")
