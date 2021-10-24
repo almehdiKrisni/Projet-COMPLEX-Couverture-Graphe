@@ -235,21 +235,21 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé "temps de calcul"
-    plt.subplot(2, 1, 1)
+    plt.subplot(3, 1, 1)
     plt.title("Analyse du temps de calcul en fonction du nombre de sommets n")
     plt.xlabel("n") # nombre de sommets du graphe G
     plt.ylabel("t(n)") # temps de calcul en fonction du nombre de sommets du graphe G
     plt.plot(x, y1, color = 'blue')
 
     # Construction et affichage du tracé "qualité des solutions"
-    plt.subplot(2, 1, 2)
+    plt.subplot(3, 1, 2)
     plt.title("Analyse de la qualité des solutions en fonction du nombre de sommets n")
     plt.xlabel("n") # nombre de sommets du graphe G
     plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
     plt.plot(x, y2, color = 'green')
 
     if (mode > 2) : # Construction et affichage du tracé "nombre de noeuds générés"
-        plt.subplot(2, 1, 3)
+        plt.subplot(3, 1, 3)
         plt.title("Nombre de noeuds générés dans l'algorithme de branchement en fonction du nombre de sommets n")
         plt.xlabel("n") # nombre de sommets du graphe G
         plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
@@ -615,6 +615,10 @@ def branchementBornesCouplage(G, verbose=False) :
         print("Le graphe est vide, C = {}")
         return -1
 
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
+
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
     rootBorneSup = len(algoCouplage(G))
@@ -625,10 +629,6 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
-
-    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
-    if (aretesGrapheToList(G) == []) :
-        return [s for s in G.keys()], nbNoeudsGeneres
 
     #  On récupère la première arete du graphe
     areteInitiale = aretesGrapheToList(G)[0]
@@ -781,6 +781,10 @@ def branchementOptimiseCouplage(G, verbose=False) :
         print("Le graphe est vide, C = {}")
         return -1
 
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
+
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
     rootBorneSup = len(algoCouplage(G))
@@ -791,10 +795,6 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
-
-    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
-    if (aretesGrapheToList(G) == []) :
-        return [s for s in G.keys()], nbNoeudsGeneres
 
     #  On récupère la première arete du graphe
     areteInitiale = aretesGrapheToList(G)[0]
@@ -969,6 +969,10 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         print("Le graphe est vide, C = {}")
         return -1
 
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
+
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
     rootBorneSup = len(algoCouplage(G))
@@ -981,10 +985,6 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         if verbose :
             print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
         return optiC
-
-    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
-    if (aretesGrapheToList(G) == []) :
-        return [s for s in G.keys()], nbNoeudsGeneres
 
     #  On récupère la premiere arete du graphe
     uDegreMax = sommetDegresMax(G)
@@ -1276,9 +1276,11 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode plotPerformances sur les algorithmes de branchement
-plotPerformances(0.2, 15, 1, 3, verbose=True, save=True)
-plotPerformances(0.5, 15, 1, 4, verbose=True, save=True)
-plotPerformances(0.9, 15, 1, 5, verbose=True, save=True)
+plotPerformances(0.2, 15, 2.5, 3, verbose=True, save=True)
+plotPerformances(0.5, 15, 2.5, 3, verbose=True, save=True)
+plotPerformances(0.9, 15, 2.5, 3, verbose=True, save=True)
+plotPerformances(0.22, 15, 2.5, 3, verbose=True, save=True)
+
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
