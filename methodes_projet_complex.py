@@ -435,7 +435,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Sauvegarde du tracé
     if (save) :
-        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + ".jpeg", transparent = True)
+        plt.savefig("TestResults/" + nomAlgo + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
 
     plt.show()
 
@@ -1259,5 +1259,5 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------
 
-plotPerformances(0.2, 10, 0.01, 3)
+plotPerformances(0.2, 10, 0.05, 1, save=True)
 
