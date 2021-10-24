@@ -261,6 +261,67 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     plt.show()
 
+#------------------------------------------------------------------------------------------------------
+
+# Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme choisi
+def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = False):
+    """ nMax : nombre de noeuds maximale pour le graphe
+        p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
+        nbIterations : nombre d'éxecutions de l'algorithme, dans le but d'en déduir une performance moyenne
+        verbose : "True" pour afficher le détail des itérations
+        save : "True" pour enregistrer le tracé en format jpg
+    """
+    y = []   # axe des ordonnées : rapport d'approximation des algorithmes couplage et glouton
+    x = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
+    
+    # Pour chaque 1/10 de nMax
+    for i in range(1, 11) :
+
+        tabRappApprox = []
+        r = 0
+        
+        # Pour chacune des nbIterations démandées en paramètre
+        for ite in range(nbIterations):
+
+            # Méthode permettant de générer des graphes aléatoires
+            G = randomGraphe(int(nMax * (i / 10)), p)
+            resAC = len(algoCouplage(G))
+            resAG = len(algoGlouton(G))
+
+            r = resAG/resAC
+            tabRappApprox.append(r) # qualité des solutions pour l'itération courante
+
+            if verbose : 
+                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\tRapport d'approximation :", r, "\n")
+
+        # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
+        moyR = sum(tabRappApprox)/len(tabRappApprox)
+        
+        y.append(moyR)
+        x.append(int(nMax * (i / 10)))
+
+        if verbose : 
+            print("\nx = ", i, "/10 nMax (" + str(int(nbIterations * i/10)) + ")\n\t\tRapport d'approximation :", r, "\n")
+            print("----------------------------------------------------------------------------------------------\n")
+
+
+    # Affichage graphique
+    plt.figure(figsize = (10, 10))
+    plt.suptitle("Rapport d'approximation des algorithmes algo_couplage et algo_glouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
+
+    # Construction et affichage du tracé
+    plt.xlabel("n") # nombre de sommets du graphe G
+    plt.ylabel("r") # rapport d'approximation
+    plt.plot(x, y, color = 'blue')
+
+    # Sauvegarde du tracé
+    if (save) :
+        plt.savefig("TestResults/rapportApproximation_p=" + str(p) + "_" + str(datetime.date.today()) + str(datetime.datetime.now().strftime("_%H_%M_%S")) + ".jpeg", transparent = True)
+
+    plt.show()
+
+
 
 
 
