@@ -31,6 +31,8 @@ import math
 
 # Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
 def aretesGrapheToList(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     E = []
     for s1 in G.keys() :
         for s2 in G[s1] :
@@ -42,6 +44,8 @@ def aretesGrapheToList(G) :
 
 # Méthode permettant d'acquérir un graphe G (modelisation : dictionnaire) depuis un fichier texte
 def acquisitionGraphe(nomFichier):
+    """ nomFichier : chaine de caractéres representant un fichier texte d'extension .txt
+    """
     G = {}
     phase = 0
     with open(nomFichier, 'r') as fichier:
@@ -73,6 +77,9 @@ def acquisitionGraphe(nomFichier):
 
 # Méthode permettant d'afficher à l'écran un graphe non orienté et, éventuellement, un titre
 def showGraphe(G, titre = "G"):
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        titre : titre du graphe à afficher, 'G' par defaut
+    """
     newG = nx.Graph()
     newG.add_nodes_from(list(G.keys()))
     for v1 in G.keys() :
@@ -97,7 +104,6 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         verbose : "True" pour afficher le détail des itérations
         save : "True" pour enregistrer le tracé en format jpg
     """
-
     # Calcul de la taille nMaxAGlouton pour l'algorithme (G)
     # nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     nMax = 0
@@ -243,6 +249,9 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
 def suppSommet(initG, v) :
+    """ initG : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        v : un sommet à supprimer
+    """
     if v not in initG.keys() :
         print("\nLe sommet", v, "n'est pas dans le graphe G : le graphe G'=G\{v} est équivalent à G.\n")
         return initG
@@ -277,6 +286,9 @@ def suppSommet(initG, v) :
 
 # Méthode permettant de supprimer plusieurs sommets à la fois d'un graphe G et d'obtenir le graphe G' résultant de la suppression des sommets
 def multSuppSommet(G, ensv) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        ensv : liste de sommets à supprimer
+    """
     modifG = copy.deepcopy(G)
 
     for v in ensv :
@@ -288,7 +300,8 @@ def multSuppSommet(G, ensv) :
 
 # Méthode renvoyant un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
 def degresSommet(G) :
-
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     # Création d'un dictionnaire 'tab' contenant les degres de chaque sommet du graphe G
     tab = dict()
     for v in G.keys() :
@@ -300,6 +313,8 @@ def degresSommet(G) :
 
 # Méthode permettant de retourner le sommet ayant le degre maximal dans le graphe G
 def sommetDegresMax(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     v = list(deg.keys())
@@ -309,6 +324,8 @@ def sommetDegresMax(G) :
 
 # Méthode permettant de retourner le degre du sommet ayant le degre maximum dans le graphe G
 def valeurDegresMax(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     return max(degres)
@@ -358,6 +375,8 @@ def randomGraphe(n, p) :
 
 # Méthode representant l'algorithme de couplage sur le graphe G
 def algoCouplage(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     C = list()  # C = liste de sommets représentant le couplage
 
     for s1 in list(G.keys()) :
@@ -373,6 +392,8 @@ def algoCouplage(G) :
 
 # Méthode représentant l'algorithme glouton de couplage sur le graphe G
 def algoGlouton(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     C = []  # C = liste de sommets représentant le couplage
 
     # On réalise une copie de G afin de ne pas modifier l'original
@@ -401,6 +422,10 @@ def algoGlouton(G) :
 
 # Méthode réalisant le branchement simple
 def branchement(G, randomSelection=False, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        randomSelection : "True" si on veux dépiler les états de la pile en ordre aléatoire
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
@@ -452,10 +477,13 @@ def branchement(G, randomSelection=False, verbose=False) :
 
 # Méthode permettant de calculer le max parmi les bornes b1, b2 et b3
 def calculBorneInf(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     l = []
 
-    # Calcul de M
-    M = algoCouplage(G) # M est un couplage de G
+    # Calcul de M, M est un couplage de G
+    M = algoCouplage(G)
 
     # Calcul de n, m et c
     n = len(list(G.keys())) # n = nombre de sommets
@@ -488,10 +516,14 @@ def calculBorneInf(G, verbose=False) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement avec bornes, qui associe à chaque noeud le calcul d'une borne inférieure et d'un borne superieure
+# Fonction réalisant le branchement avec bornes, qui associe à chaque noeud
+# le calcul d'une borne inférieure et d'un borne superieure (Exercice 4.2.2)
 # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
 # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
 def branchementBornesCouplage(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     if G == {} :
@@ -644,10 +676,13 @@ def branchementBornesCouplage(G, verbose=False) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement avec bornes optimisé
+# Fonction réalisant le branchement avec bornes optimisé (Exercice 4.3.1)
 # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
 # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
 def branchementOptimiseCouplage(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     if G == {} :
@@ -821,10 +856,13 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement avec bornes optimisé, sans traiter u dans la branche droite
+# Fonction réalisant le branchement avec bornes optimisé, sans traiter u dans la branche droite (Exercice 4.3.2)
 # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
 # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
 def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     if G == {} :
@@ -1017,8 +1055,12 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 
 # Méthode d'évaluation permettant de réaliser les tests
 def evaluationAlgorithm(n, p, a) :
-    # a = permet de choisir l'algorithme à utiliser
-
+    """ n : nombre de sommets, n > 0
+        p : la probabilité qu'une arete entre 2 sommet soit créée, p E ]0,1[
+        a : valeur qui permet de choisir l'algorithme à utiliser :
+                1 = Test de branchement (4.1)
+                2 = Test de branchementBornesCouplage (4.2.2)
+    """
     # a = 1 - Test de branchement (4.1)
     if (a == 1) :
         print("EVALUATION - Algorithme : branchement (4.1).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
@@ -1029,9 +1071,9 @@ def evaluationAlgorithm(n, p, a) :
         execTime = endTime - startTime
         print("Temps d'exécution =", execTime, "secondes.\n")
 
-    # a = 2 - Test de branchementBornesCouplage (4.2)
+    # a = 2 - Test de branchementBornesCouplage (4.2.2)
     elif (a == 2) :
-        print("EVALUATION - Algorithme : branchementBornesCouplage (4.2).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
+        print("EVALUATION - Algorithme : branchementBornesCouplage (4.2.2).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
         testGraphe = randomGraphe(n,p)
         startTime = time.time()
         solution = branchementBornesCouplage(testGraphe, verbose=True)
