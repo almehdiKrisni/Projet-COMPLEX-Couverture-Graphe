@@ -278,24 +278,28 @@ def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = Fals
     for i in range(1, 11) :
 
         tabRappApprox = []
-        r = 0
         
         # Pour chacune des nbIterations démandées en paramètre
         for ite in range(nbIterations):
+            r = -1
 
             # Méthode permettant de générer des graphes aléatoires
             G = randomGraphe(int(nMax * (i / 10)), p)
             resAC = len(algoCouplage(G))
             resAG = len(algoGlouton(G))
 
-            r = resAG/resAC
-            tabRappApprox.append(r) # qualité des solutions pour l'itération courante
+            if resAC != 0:
+                r = resAG/resAC
+                tabRappApprox.append(r)
 
             if verbose : 
                 print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\tRapport d'approximation :", r, "\n")
 
         # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
-        moyR = sum(tabRappApprox)/len(tabRappApprox)
+        if len(tabRappApprox) != 0 :
+            moyR = sum(tabRappApprox)/len(tabRappApprox)
+        else :
+            moyR = -1
         
         y.append(moyR)
         x.append(int(nMax * (i / 10)))
@@ -307,12 +311,13 @@ def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = Fals
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.suptitle("Rapport d'approximation des algorithmes algo_couplage et algo_glouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    plt.title("Rapport d'approximation des algorithmes algoCouplage et algoGlouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé
     plt.xlabel("n") # nombre de sommets du graphe G
     plt.ylabel("r") # rapport d'approximation
+    plt.axis([0, nMax, 0, r+1])
     plt.plot(x, y, color = 'blue')
 
     # Sauvegarde du tracé
@@ -1346,17 +1351,17 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode plotPerformances sur les algorithmes de branchement
-plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
-plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
-plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode plotPerformances sur l
-plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
-plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
-plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1398,4 +1403,10 @@ plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
 # for i in range(d) :
 #     numberOfNodes = (int)(n * ((i + 1) / d))
 #     evaluationAlgorithm(numberOfNodes, 0.2, 1)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Evalutation du rapport d'approximation (question 4.4.1)
+plotRapportApproximation(10, 0.5, 10, verbose = False, save = False)
 # print("\n----------------------------------------------------------------------------------------\n")
