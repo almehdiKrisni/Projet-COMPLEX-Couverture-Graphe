@@ -18,7 +18,6 @@ import copy
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
-from numpy import empty, save
 import time
 import datetime
 import math
@@ -29,22 +28,9 @@ import math
 # OUTILS
 #######################################################################################################
 
-# Méthodes permettant de convertir un tuple (V,E) ou un graphe G en un graphe de la librairie nxgraph
-def convertGraph(G) :
-    newG = nx.Graph()
-
-    newG.add_nodes_from(list(G.keys()))
-    for v1 in G.keys() :
-        for v2 in G.keys() :
-            if (v2, v1) not in newG.edges and v2 in G[v1]:
-                newG.add_edge(v1, v2)
-
-    return newG
-
-#------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
-def areteGraphe(G) :
+def aretesGrapheToList(G) :
     E = []
     for s1 in G.keys() :
         for s2 in G[s1] :
@@ -79,17 +65,23 @@ def acquisitionGraphe(nomFichier):
                     G[s1].append(s2)
                     G[s2].append(s1)
                 else :
-                    print("Format de fichier invalide : chaque arete doit avoir 2 sommets")
+                    print("Format de fichier invalide : chaque arete doit etre constituée de exactement 2 sommets")
 
     return G   
 
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher à l'écran un graphe non orienté et, éventuellement, un titre
-def showGraphe(G, titre = ""):
+def showGraphe(G, titre = "G"):
+    newG = nx.Graph()
+    newG.add_nodes_from(list(G.keys()))
+    for v1 in G.keys() :
+        for v2 in G.keys() :
+            if (v2, v1) not in newG.edges and v2 in G[v1]:
+                newG.add_edge(v1, v2)
 
     plt.title(titre)
-    nx.draw(G, with_labels=True, node_size=1500, node_color="skyblue", pos=nx.circular_layout(G))
+    nx.draw(newG, with_labels=True, node_size=1500, node_color="skyblue", pos=nx.circular_layout(G))
 
     plt.show()   
 
@@ -143,7 +135,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     y1 = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme sélectionné(G)
     y2 = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme sélectionné(G)
-    x = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
+    x = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
     
     # Pour chaque 1/10 de nMax
     for i in range(1, 11) :
@@ -252,7 +244,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
 def suppSommet(initG, v) :
     if v not in initG.keys() :
-        print("Le sommet", v, "n'est pas dans le graphe G. Le graphe G' est équivalent à G.\n")
+        print("\nLe sommet", v, "n'est pas dans le graphe G : le graphe G'=G\{v} est équivalent à G.\n")
         return initG
 
     # On réalise une copie de initG pour ne pas le modifier
@@ -297,7 +289,7 @@ def multSuppSommet(G, ensv) :
 # Méthode renvoyant un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
 def degresSommet(G) :
 
-    # Création d'un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
+    # Création d'un dictionnaire 'tab' contenant les degres de chaque sommet du graphe G
     tab = dict()
     for v in G.keys() :
         tab[v] = len(list(G[v]))
@@ -306,22 +298,18 @@ def degresSommet(G) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant de retourner l'indice du sommet ayant le degres maximal dans le graphe G
+# Méthode permettant de retourner le sommet ayant le degre maximal dans le graphe G
 def sommetDegresMax(G) :
-
-    """ a) create a list of the dict's keys and values; 
-        b) return the key with the max value"""  
-    deg = degresSommet(G)
+    deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     v = list(deg.keys())
     return v[degres.index(max(degres))]
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant de retourner le degre maximum parmi les degres des sommets du graphe G
+# Méthode permettant de retourner le degre du sommet ayant le degre maximum dans le graphe G
 def valeurDegresMax(G) :
-
-    deg = degresSommet(G) # dictionnaire { nbSommet : sommetsAdjacents }
+    deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     return max(degres)
 
@@ -339,11 +327,11 @@ def randomGraphe(n, p) :
     # Création du graphe
     G = dict()
 
-    # Liste des sommets
+    # Creation de la liste des sommets
     for i in range(n) :
         G[i] = []
     
-    # Liste des aretesS
+    # Creation de la liste des aretes, ajoutées au graphe G suivant une probabilité p de présence
     for v1 in G.keys() :
         for v2 in G.keys() :
             if v1 != v2 :
@@ -370,9 +358,8 @@ def randomGraphe(n, p) :
 
 # Méthode representant l'algorithme de couplage sur le graphe G
 def algoCouplage(G) :
-    C = list() # Ensemble représentant le couplage
+    C = list()  # C = liste de sommets représentant le couplage
 
-    # Début de l'algorithme
     for s1 in list(G.keys()) :
         for s2 in list(G[s1]) :
             if (s1 not in C) and (s2 not in C) :
@@ -386,17 +373,23 @@ def algoCouplage(G) :
 
 # Méthode représentant l'algorithme glouton de couplage sur le graphe G
 def algoGlouton(G) :
-    C = [] # Ensemble représentant le couplage
-    copyG = copy.deepcopy(G) # On réalise une copie de G afin de ne pas modifier l'original
-    E = areteGraphe(copyG) # Liste des arêtes du graphe G
+    C = []  # C = liste de sommets représentant le couplage
 
-    # Début de l'algorithme
+    # On réalise une copie de G afin de ne pas modifier l'original
+    copyG = copy.deepcopy(G)
+    E = aretesGrapheToList(copyG) # Liste des arêtes du graphe G
+
     while E != [] :
-        v = sommetDegresMax(copyG) # Sommet au degrès maximal
 
-        copyG = suppSommet(copyG, v) # On supprime ce sommet du graphe
-        C.append(v) # On ajoute le sommet à la couverture
-        E = [e for e in E if v not in e] # On supprime les arêtes couvertes par le sommet
+        # On determine le sommet de degrès maximal et on le supprime du graphe
+        v = sommetDegresMax(copyG)
+        copyG = suppSommet(copyG, v)
+
+        # On ajoute le sommet à la couverture
+        C.append(v)
+
+        # On supprime les arêtes couvertes par le sommet v
+        E = [e for e in E if v not in e]
 
     return C
 
@@ -411,8 +404,8 @@ def branchement(G, randomSelection=False, verbose=False) :
     nbNoeudsGeneres = 1 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
-    if (areteGraphe(G) != []) :
-        areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe si elle existe
+    if (aretesGrapheToList(G) != []) :
+        areteInitiale = aretesGrapheToList(G)[0] # On récupère la première arete du graphe si elle existe
     else :
         return [n for n in G.keys()] # Sinon on renvoie l'ensemble des nodes de G
 
@@ -433,14 +426,14 @@ def branchement(G, randomSelection=False, verbose=False) :
             state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
             # On récupère une arete aléatoire
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
+            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
             leftNode = areteEtude[0]
             rightNode = areteEtude[1]
             nbNoeudsGeneres += 1
@@ -452,7 +445,7 @@ def branchement(G, randomSelection=False, verbose=False) :
     if (verbose) :
         print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
 
-    # On retourne C
+    # On retourne la meilleure couverture trouvée
     return optiC
 
 #------------------------------------------------------------------------------------------------------
@@ -470,7 +463,7 @@ def calculBorneInf(G, verbose=False) :
 
     # Calcul de n, m et c
     n = len(list(G.keys())) # nombre de sommets
-    m = len(areteGraphe(G)) # nombre d'aretes
+    m = len(aretesGrapheToList(G)) # nombre d'aretes
     c = len(C) # cardinalite de la couverture minimale
 
     # Calcul de b1
@@ -515,7 +508,7 @@ def branchementBornesCouplage(G, verbose=False) :
     # print("optic =", optiC)
 
     #  On récupère la première arete du graphe
-    areteInitiale = areteGraphe(G)[0]
+    areteInitiale = aretesGrapheToList(G)[0]
     # print("on choisit l'arete initiale", areteInitiale)
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
@@ -567,7 +560,7 @@ def branchementBornesCouplage(G, verbose=False) :
         state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
                 # print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
@@ -578,7 +571,7 @@ def branchementBornesCouplage(G, verbose=False) :
             # print(">>> G it.", i, ":", state[1] )
 
             # On récupère la première arete du branchement
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
+            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
             # print("areteEtude", areteEtude)
 
             # Calcul des informations du noeud de droite
@@ -644,7 +637,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
     print("optic =", optiC)
 
     #  On récupère la première arete du graphe
-    areteInitiale = areteGraphe(G)[0]
+    areteInitiale = aretesGrapheToList(G)[0]
     print("on choisit l'arete initiale", areteInitiale)
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
@@ -702,7 +695,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
         state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
                 print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
@@ -713,7 +706,7 @@ def branchementOptimiseCouplage(G, verbose=False) :
             print(">>> G it.", i, ":", state[1] )
 
             # On récupère la première arete du branchement
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
+            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
             print("areteEtude", areteEtude)
 
             # Calcul des informations du noeud de droite
@@ -785,7 +778,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     uDegreMax = sommetDegresMax(G)
     Gprime = {}
     Gprime[uDegreMax] = G[uDegreMax]
-    areteInitiale = areteGraphe(Gprime)[0]
+    areteInitiale = aretesGrapheToList(Gprime)[0]
     print("on choisit l'arete initiale", areteInitiale)
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
@@ -853,7 +846,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
                 print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
@@ -867,7 +860,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
             uDegreMax = sommetDegresMax(state[1])
             Gprime = {}
             Gprime[uDegreMax] = (state[1])[uDegreMax]
-            areteEtude = areteGraphe(Gprime)[0] # On récupère la  arete du graphe avec max d
+            areteEtude = aretesGrapheToList(Gprime)[0] # On récupère la  arete du graphe avec max d
             print("areteEtude", areteEtude)
 
             # Calcul des informations du noeud de droite
@@ -974,7 +967,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 # Tests sur l'algorithme de couplage
 # G = randomGraphe(8, 0.2)
 # print(algoCouplage(G))
-# print(areteGraphe(G))
+# print(aretesGrapheToList(G))
 # showGraphe(convertGraph(G))
 
 #------------------------------------------------------------------------------------------------------
@@ -991,9 +984,9 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode acquisitionGraphe depuis un fichier texte
-# G = acquisitionGraphe("exempleinstance.txt")
-# print("G = ", G, "\n")
-# showGraphe(convertGraph(G))
+G = acquisitionGraphe("exempleinstance.txt")
+print("G = ", G, "\n")
+showGraphe(G)
 
 #------------------------------------------------------------------------------------------------------
 
