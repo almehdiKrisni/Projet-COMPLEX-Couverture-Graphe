@@ -322,7 +322,7 @@ def plotRapportApproximation(nMax, p, nbIterations, mode, verbose = False, save 
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.title("Rapport d'approximation des algorithmes algoCouplage et algoGlouton en f(n) avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
+    plt.title("Rapport d'approximation des algorithmes algoCouplage et algoGlouton en f(n) avec nMax = " + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 10)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé
@@ -1362,30 +1362,16 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
-<<<<<<< HEAD
 # Test méthode plotPerformances sur les algorithmes de branchement bornesCouplage
 # plotPerformances(0.3, 1, 1, 4, verbose=True, save=True)
 # plotPerformances(0.7, 5, 1, 4, verbose=True, save=True)
-=======
-# Test méthode plotPerformances sur les algorithmes de branchement
-# plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
-# plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
-# plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
->>>>>>> d643abbd18373657552e6259bc99864922a7ee77
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
-<<<<<<< HEAD
 # Test méthode plotPerformances sur l'algorithme de branchement 
-plotPerformances(0.3, 5, 1, 5, verbose=True, save=True)
-plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
-=======
-# Test méthode plotPerformances sur l
-# plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
-# plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
-# plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
->>>>>>> d643abbd18373657552e6259bc99864922a7ee77
+# plotPerformances(0.3, 5, 1, 5, verbose=True, save=True)
+# plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1432,5 +1418,5 @@ plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
 #------------------------------------------------------------------------------------------------------
 
 # Evalutation du rapport d'approximation (question 4.4.1)
-plotRapportApproximation(10, 0.5, 10, 1, verbose = False, save = False)
+# plotRapportApproximation(10, 0.5, 10, 1, verbose = False, save = False)
 # print("\n----------------------------------------------------------------------------------------\n")
