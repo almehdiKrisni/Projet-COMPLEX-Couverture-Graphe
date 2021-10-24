@@ -252,7 +252,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         plt.subplot(3, 1, 3)
         plt.title("Nombre de noeuds générés dans l'algorithme de branchement en fonction du nombre de sommets n")
         plt.xlabel("n") # nombre de sommets du graphe G
-        plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
+        plt.ylabel("c(n)") # nombre de noeuds crées durant le branchement en fonction du nombre de sommets du graphe G
         plt.plot(x, y3, color = 'red')
 
     # Sauvegarde du tracé
@@ -1276,11 +1276,26 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode plotPerformances sur les algorithmes de branchement
-plotPerformances(0.2, 15, 2.5, 3, verbose=True, save=True)
-plotPerformances(0.5, 15, 2.5, 3, verbose=True, save=True)
-plotPerformances(0.9, 15, 2.5, 3, verbose=True, save=True)
-plotPerformances(0.22, 15, 2.5, 3, verbose=True, save=True)
+# plotPerformances(0.2, 15, 2.5, 3, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 3, verbose=True, save=True)
+# plotPerformances(0.9, 15, 2.5, 3, verbose=True, save=True)
+# plotPerformances(0.22, 15, 2.5, 3, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
 
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode plotPerformances sur les algorithmes de branchement
+plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
+plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
+plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode plotPerformances sur l
+plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
+plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
+plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
