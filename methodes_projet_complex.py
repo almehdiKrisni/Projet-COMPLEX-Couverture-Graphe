@@ -429,18 +429,53 @@ def branchement(G, randomSelection=False, verbose=False) :
     nbNoeudsGeneres = 1 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
-    if (aretesGrapheToList(G) != []) :
-        areteInitiale = aretesGrapheToList(G)[0] # On récupère la première arete du graphe si elle existe
-    else :
-        return [n for n in G.keys()] # Sinon on renvoie l'ensemble des nodes de G
+    if G == {} :
+        print("Le graphe est vide, C = {}")
+        return -1
+
+    # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
+    optiC = algoCouplage(G)
+    
+    #  On récupère la première arete du graphe
+    areteInitiale = aretesGrapheToList(G)[0]
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G ]
-    statesToStudy = [] # Pile des états du branchement à étudier
-    statesToStudy.append([[areteInitiale[0]], suppSommet(G, areteInitiale[0])])
-    statesToStudy.append([[areteInitiale[1]], suppSommet(G, areteInitiale[1])])
+    statesToStudy = list() # Pile des états du branchement à étudier
+
+    if verbose:
+        print("Initialisation algorithme 'branchement' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
+
+
+    # Création des informations du noeud de droite
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
+    statesToStudy.insert(0, [[areteInitiale[1]], newGraphe])
+    nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[1]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[1]) +"} :", areteInitiale[1])
+        print("\n")
+
+
+    # Création des informations du noeud de gauche
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[0])
+    statesToStudy.insert(0, [[areteInitiale[0]], newGraphe])
+    nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteInitiale[0] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[0]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[0]) +"} :", areteInitiale[0])
+        print("\n")
+
 
     # Début de l'algorithme de branchement
-    while (statesToStudy != []) :
+    while (len(statesToStudy) != 0) :
 
         # Choix de la méthode de sélection d'état
         if (randomSelection) :
@@ -454,21 +489,43 @@ def branchement(G, randomSelection=False, verbose=False) :
         if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
+            print("Meilleure couverture optimale :", optiC)
+
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
-            # On récupère une arete aléatoire
-            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
-            leftNode = areteEtude[0]
-            rightNode = areteEtude[1]
+            # On récupère la première arete du graphe
+            areteEtude = aretesGrapheToList(state[1])[0]
+
+            # Calcul des informations du noeud de droite
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
+            statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe])
             nbNoeudsGeneres += 1
 
-            # On ajoute deux feuilles à la liste (on priorise le fils de gauche, soit le premier élément de l'arete étudiée)
-            statesToStudy.insert(0, [state[0] + [rightNode], suppSommet(state[1], rightNode)])
-            statesToStudy.insert(0, [state[0] + [leftNode], suppSommet(state[1], leftNode)])
-        
-    if (verbose) :
+            if verbose :
+                print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
+                print("\t\tGraphe G\{" + str(areteEtude[1]) +"} :", newGraphe)
+                print("\t\tCouverture pour G\{" + str(areteEtude[1]) +"} :", state[0])
+                print("\n")
+
+
+            # Calcul des informations du noeud de gauche
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[0])
+
+            statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe])
+            nbNoeudsGeneres += 1
+
+            if verbose :
+                print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteEtude[0] ,") :")
+                print("\t\tGraphe G\{" + str(areteEtude[0]) +"} :", newGraphe)
+                print("\t\tCouverture pour G\{" + str(areteEtude[0]) +"} :", state[0])
+                print("\n")
+
+    if verbose :
         print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
+        print("Couverture optimale retournée par la méthode 'branchement' :", optiC)
 
     # On retourne la meilleure couverture trouvée
     return optiC
@@ -548,9 +605,9 @@ def branchementBornesCouplage(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation :")
-        print("Solution optimale de la racine :", optiC)
-        print("Arete à traiter :", areteInitiale)
+        print("Initialisation algorithme 'branchementBornesCouplage' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
 
 
     # Création des informations du noeud de droite
@@ -707,9 +764,9 @@ def branchementOptimiseCouplage(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation :")
-        print("Solution optimale de la racine :", optiC)
-        print("Arete à traiter :", areteInitiale)
+        print("Initialisation algorithme 'branchementOptimiseCouplage' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
 
 
     # Création des informations du noeud de droite
@@ -892,9 +949,9 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation :")
-        print("Solution optimale de la racine :", optiC)
-        print("Arete à traiter :", areteInitiale)
+        print("Initialisation algorithme 'branchementOptimiseCouplage_uDegreMax' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
 
 
     # Création des informations du noeud de droite
