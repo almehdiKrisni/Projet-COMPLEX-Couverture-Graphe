@@ -141,6 +141,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     y1 = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme sélectionné(G)
     y2 = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme sélectionné(G)
+    y3 = []  # axe des ordonnées : liste du nombre de noeuds générés pour l'algorithme de branchement (G)
     x = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
     
     # Pour chaque 1/10 de nMax
@@ -188,6 +189,8 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
             tabTemps.append(t) # temps de calcul de l'algorithme pour l'itération courante
             resAlgo.append(len(res)) # qualité des solutions pour l'itération courante
+            if (mode > 2) : # Dans le cas ou on utilise un algorithme de branchement
+                tabNoeudsGeneneres.append(nbNoeuds)
 
             if verbose : 
                 print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\ttabTemps =", tabTemps, "\n\t\tresAlgo =", resAlgo, "\n")
@@ -195,9 +198,14 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         # Calcul et stockage du temps d'execution moyen et de la qualité des solutions moyenne par rapport aux 'nbIterations' éxecutions
         moyTemps = sum(tabTemps)/len(tabTemps)
         moyQualiteSolutions = int(sum(resAlgo)/len(resAlgo))
+        if (mode > 2) :
+            moyNbNoeudsGeneres = int(sum(tabNoeudsGeneneres)/len(tabNoeudsGeneneres))
+        
 
         y1.append(moyTemps)
         y2.append(moyQualiteSolutions)
+        if (mode > 2) :
+            y3.append(moyNbNoeudsGeneres)
         x.append(int(nMax * (i / 10)))
 
         if verbose : 
@@ -223,7 +231,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     # Affichage graphique
     plt.figure(figsize = (10, 10))
-    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'red', size = 15)
+    plt.suptitle("Performances de l'algorithme " + nomAlgo + " avec nMax =" + str(nMax) + " nodes dans le graphe et p = " + str(p) + "\n", color = 'black', size = 15)
     plt.rc('xtick', labelsize=10)    # fontsize of the tick labels
 
     # Construction et affichage du tracé "temps de calcul"
@@ -239,6 +247,13 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
     plt.xlabel("n") # nombre de sommets du graphe G
     plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
     plt.plot(x, y2, color = 'green')
+
+    if (mode > 2) : # Construction et affichage du tracé "nombre de noeuds générés"
+        plt.subplot(2, 1, 3)
+        plt.title("Nombre de noeuds générés dans l'algorithme de branchement en fonction du nombre de sommets n")
+        plt.xlabel("n") # nombre de sommets du graphe G
+        plt.ylabel("q(n)") # qualité des solutions (taille du couplage) en fonction du nombre de sommets du graphe G
+        plt.plot(x, y3, color = 'red')
 
     # Sauvegarde du tracé
     if (save) :
@@ -441,6 +456,10 @@ def branchement(G, randomSelection=False, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
+
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
     
     #  On récupère la première arete du graphe
     areteInitiale = aretesGrapheToList(G)[0]
@@ -607,6 +626,10 @@ def branchementBornesCouplage(G, verbose=False) :
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
 
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
+
     #  On récupère la première arete du graphe
     areteInitiale = aretesGrapheToList(G)[0]
 
@@ -768,6 +791,10 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
+
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
 
     #  On récupère la première arete du graphe
     areteInitiale = aretesGrapheToList(G)[0]
@@ -954,6 +981,10 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         if verbose :
             print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
         return optiC
+
+    # On vérifie qu'il existe des aretes dans le graphe. Si non, on retourne l'ensemble des sommets du graphe comme solution
+    if (aretesGrapheToList(G) == []) :
+        return [s for s in G.keys()], nbNoeudsGeneres
 
     #  On récupère la premiere arete du graphe
     uDegreMax = sommetDegresMax(G)
@@ -1244,10 +1275,10 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
-# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
+# Test méthode plotPerformances sur les algorithmes de branchement
+plotPerformances(0.2, 15, 1, 3, verbose=True, save=True)
+plotPerformances(0.5, 15, 1, 4, verbose=True, save=True)
+plotPerformances(0.9, 15, 1, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
