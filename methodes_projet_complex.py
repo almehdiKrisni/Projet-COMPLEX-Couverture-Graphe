@@ -152,6 +152,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         moyQualiteSolutions = 0
         tabNoeudsGeneneres = []
         moyNbNoeudsGeneres = 0
+        nbNoeuds = 0
         
 
         # Pour chacune des nbIterations démandées en paramètre
@@ -171,13 +172,13 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
             elif (mode == 2) :
                 res = algoGlouton(G)
             elif (mode == 3) :
-                res = branchement(G)
+                res, nbNoeuds = branchement(G)
             elif (mode == 4) :
-                res = branchementBornesCouplage(G)
+                res, nbNoeuds = branchementBornesCouplage(G)
             elif (mode == 5) :
-                res = branchementOptimiseCouplage(G)
+                res, nbNoeuds = branchementOptimiseCouplage(G)
             elif (mode == 6) :
-                res = branchementOptimiseCouplage_uDegreMax(G)
+                res, nbNoeuds = branchementOptimiseCouplage_uDegreMax(G)
             else :
                 print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
                 return
@@ -535,8 +536,8 @@ def branchement(G, randomSelection=False, verbose=False) :
         print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
         print("Couverture optimale retournée par la méthode 'branchement' :", optiC)
 
-    # On retourne la meilleure couverture trouvée
-    return (optiC, nbNoeudsGeneres)
+    # On retourne la meilleure couverture trouvée et le nombre de noeuds générés
+    return optiC, nbNoeudsGeneres
 
 #------------------------------------------------------------------------------------------------------
 
@@ -739,8 +740,8 @@ def branchementBornesCouplage(G, verbose=False) :
         print("Nombre de noeuds générés avec la méthode 'branchementBornesCouplage' :", nbNoeudsGeneres)
         print("Couverture optimale retournée par la méthode 'branchementBornesCouplage' :", optiC)
 
-    # On retourne la meilleure couverture trouvée
-    return (optiC, nbNoeudsGeneres)
+    # On retourne la meilleure couverture trouvée et le nombre de noeuds générés
+    return optiC, nbNoeudsGeneres
 
 #------------------------------------------------------------------------------------------------------
 
@@ -923,8 +924,8 @@ def branchementOptimiseCouplage(G, verbose=False) :
         print("Nombre de noeuds générés avec la méthode 'branchementOptimiseCouplage' :", nbNoeudsGeneres)
         print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage' :", optiC)
 
-    # On retourne la meilleure couverture trouvée
-    return (optiC, nbNoeudsGeneres)
+    # On retourne la meilleure couverture trouvée et le nombre de noeuds générés
+    return optiC, nbNoeudsGeneres
 
 #------------------------------------------------------------------------------------------------------
 
@@ -1114,8 +1115,8 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         print("Nombre de noeuds générés avec la méthode 'branchementOptimiseCouplage_uDegreMax' :", nbNoeudsGeneres)
         print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
 
-    # On retourne la meilleure couverture trouvée
-    return (optiC, nbNoeudsGeneres)
+    # On retourne la meilleure couverture trouvée et le nombre de noeuds générés
+    return optiC, nbNoeudsGeneres
 
 
 
