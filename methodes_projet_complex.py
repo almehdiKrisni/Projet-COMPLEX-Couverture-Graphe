@@ -1058,5 +1058,39 @@ print("G = ", G, "\n")
 #------------------------------------------------------------------------------------------------------
 
 # Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
-showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+
+
+#######################################################################################################
+# EVALUATIONS
+#######################################################################################################
+
+# Dans cette partie, on s'occupe de l'évaluation des différents algorithmes
+# Ces résultats seront présentés dans le rapport dans les parties désignées
+
+# Méthode d'évaluation permettant de réaliser les tests
+def evaluationAlgorithm(n, p, a) :
+    # a = permet de choisir l'algorithme à utiliser
+
+    # a = 1 - Test de branchement (4.1)
+    if (a == 1) :
+        print("EVALUATION - Algorithme : branchement (4.1).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
+        testGraphe = randomGraphe(n,p)
+        startTime = time.time()
+        solution = branchement(G)
+        endTime = time.time()
+        execTime = endTime - startTime
+        print("Temps d'exécution =", execTime, "secondes.\n")
+
+    # La valeur de a ne correspond à aucun algorithme
+    else :
+        print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
+
+# Evalutation de branchement (question 4.1)
+n = 1000 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
+d = 10 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
+for i in range(d) :
+    numberOfNodes = (int)(n * ((i + 1) / d))
+    evaluationAlgorithm(numberOfNodes, 0.5, 1)
+
