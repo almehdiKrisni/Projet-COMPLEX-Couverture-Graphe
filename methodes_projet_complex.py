@@ -1237,38 +1237,17 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformances sur Couplage et Glouton
-<<<<<<< HEAD
-plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
-plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
-
-#------------------------------------------------------------------------------------------------------
-
-# Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
-# showGraphe(acquisitionGraphe("exempleinstance.txt"))
-
-# print("ValeurDegresMax = ", valeurDegresMax(G))
-# print("calculBornesInf =", calculBornesInf(G))
-=======
 # plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
 # plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
->>>>>>> e28b2283839a78f71ce2b32d0a41bf1e41e64405
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-<<<<<<< HEAD
-# plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
-=======
 # plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
 # plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
 # plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
->>>>>>> e28b2283839a78f71ce2b32d0a41bf1e41e64405
 
 #------------------------------------------------------------------------------------------------------
 
