@@ -443,9 +443,10 @@ def branchement(G, randomSelection=False, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation algorithme 'branchement' :")
+        print("\nInitialisation algorithme 'branchement' (noeud racine) :")
         print("\t\tSolution optimale de la racine :", optiC)
         print("\t\tArete à traiter :", areteInitiale)
+        print("\n")
 
 
     # Création des informations du noeud de droite
@@ -489,7 +490,9 @@ def branchement(G, randomSelection=False, verbose=False) :
         if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-            print("Meilleure couverture optimale :", optiC)
+                
+            if verbose :    
+                print("Meilleure couverture optimale :", optiC)
 
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
@@ -605,9 +608,10 @@ def branchementBornesCouplage(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation algorithme 'branchementBornesCouplage' :")
+        print("\nInitialisation algorithme 'branchementBornesCouplage' (noeud racine) :")
         print("\t\tSolution optimale de la racine :", optiC)
         print("\t\tArete à traiter :", areteInitiale)
+        print("\n")
 
 
     # Création des informations du noeud de droite
@@ -668,7 +672,9 @@ def branchementBornesCouplage(G, verbose=False) :
         if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-            print("Meilleure couverture optimale :", optiC)
+
+            if verbose :    
+                print("Meilleure couverture optimale :", optiC)
 
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
@@ -764,9 +770,10 @@ def branchementOptimiseCouplage(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation algorithme 'branchementOptimiseCouplage' :")
+        print("\nInitialisation algorithme 'branchementOptimiseCouplage' (noeud racine) :")
         print("\t\tSolution optimale de la racine :", optiC)
         print("\t\tArete à traiter :", areteInitiale)
+        print("\n")
 
 
     # Création des informations du noeud de droite
@@ -838,7 +845,10 @@ def branchementOptimiseCouplage(G, verbose=False) :
         if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-            print("Meilleure couverture optimale :", optiC)
+
+            if verbose :    
+                print("Meilleure couverture optimale :", optiC)
+
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
@@ -949,10 +959,10 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     statesToStudy = list() # Pile des états du branchement à étudier
 
     if verbose:
-        print("Initialisation algorithme 'branchementOptimiseCouplage_uDegreMax' :")
+        print("\nInitialisation algorithme 'branchementOptimiseCouplage_uDegreMax' (noeud racine) :")
         print("\t\tSolution optimale de la racine :", optiC)
         print("\t\tArete à traiter :", areteInitiale)
-
+        print("\n")
 
     # Création des informations du noeud de droite
     newGraphe = copy.deepcopy(G)
@@ -1024,7 +1034,10 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
         if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-            print("Meilleure couverture optimale :", optiC)
+            
+            if verbose :    
+                print("Meilleure couverture optimale :", optiC)
+
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
@@ -1211,9 +1224,9 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode acquisitionGraphe depuis un fichier texte
-G = acquisitionGraphe("exempleinstance.txt")
-print("G = ", G, "\n")
-showGraphe(G)
+# G = acquisitionGraphe("exempleinstance.txt")
+# print("G = ", G, "\n")
+# showGraphe(G)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1221,16 +1234,6 @@ showGraphe(G)
 # Test méthodes plotPerformances sur Couplage et Glouton
 # plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
 # plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
-# print("\n----------------------------------------------------------------------------------------\n")
-
-#------------------------------------------------------------------------------------------------------
-
-# Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
-# showGraphe(acquisitionGraphe("exempleinstance.txt"))
-
-# print("ValeurDegresMax = ", valeurDegresMax(G))
-# print("calculBornesInf =", calculBornesInf(G))
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1243,24 +1246,33 @@ showGraphe(G)
 
 #------------------------------------------------------------------------------------------------------
 
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(acquisitionGraphe("exempleinstance.txt"))
-# print(valeurDegresMax(G))
+# Test sur la méthode de branchement simple
+# G = acquisitionGraphe("exempleinstance.txt")
+# print(branchement(G, verbose = True))
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+# Test sur la méthode de branchement branchementBornesCouplage
+# G = acquisitionGraphe("exempleinstance.txt")
+# print(branchementBornesCouplage(G, verbose = True))
+# showGraphe(G)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# Test sur la méthode de branchement branchementOptimiseCouplage
+# G = acquisitionGraphe("exempleinstance.txt")
+# print(branchementOptimiseCouplage(G, verbose = True))
+# showGraphe(G)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# Test sur la méthode de branchement branchementOptimiseCouplage_uDegreMax
+# G = acquisitionGraphe("exempleinstance.txt")
+# print(branchementOptimiseCouplage_uDegreMax(G, verbose = True))
+# showGraphe(G)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
