@@ -1232,29 +1232,17 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformances sur Couplage et Glouton
-<<<<<<< HEAD
-plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
-plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
-=======
 # plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
 # plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
->>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
 
 #------------------------------------------------------------------------------------------------------
 
 # Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-<<<<<<< HEAD
-# plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
-=======
 # plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
 # plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
 # plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
->>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
 
 #------------------------------------------------------------------------------------------------------
 
