@@ -18,7 +18,6 @@ import copy
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
-from numpy import empty, save
 import time
 import datetime
 import math
@@ -29,22 +28,11 @@ import math
 # OUTILS
 #######################################################################################################
 
-# Méthodes permettant de convertir un tuple (V,E) ou un graphe G en un graphe de la librairie nxgraph
-def convertGraph(G) :
-    newG = nx.Graph()
-
-    newG.add_nodes_from(list(G.keys()))
-    for v1 in G.keys() :
-        for v2 in G.keys() :
-            if (v2, v1) not in newG.edges and v2 in G[v1]:
-                newG.add_edge(v1, v2)
-
-    return newG
-
-#------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'obtenir une liste d'arêtes à partir d'un graphe G (utile pour la partie 3)
-def areteGraphe(G) :
+def aretesGrapheToList(G) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
     E = []
     for s1 in G.keys() :
         for s2 in G[s1] :
@@ -56,6 +44,8 @@ def areteGraphe(G) :
 
 # Méthode permettant d'acquérir un graphe G (modelisation : dictionnaire) depuis un fichier texte
 def acquisitionGraphe(nomFichier):
+    """ nomFichier : chaine de caractéres representant un fichier texte d'extension .txt
+    """
     G = {}
     phase = 0
     with open(nomFichier, 'r') as fichier:
@@ -79,17 +69,26 @@ def acquisitionGraphe(nomFichier):
                     G[s1].append(s2)
                     G[s2].append(s1)
                 else :
-                    print("Format de fichier invalide : chaque arete doit avoir 2 sommets")
+                    print("Format de fichier invalide : chaque arete doit etre constituée de exactement 2 sommets")
 
     return G   
 
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher à l'écran un graphe non orienté et, éventuellement, un titre
-def showGraphe(G, titre = ""):
+def showGraphe(G, titre = "G"):
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        titre : titre du graphe à afficher, 'G' par defaut
+    """
+    newG = nx.Graph()
+    newG.add_nodes_from(list(G.keys()))
+    for v1 in G.keys() :
+        for v2 in G.keys() :
+            if (v2, v1) not in newG.edges and v2 in G[v1]:
+                newG.add_edge(v1, v2)
 
     plt.title(titre)
-    nx.draw(G, with_labels=True, node_size=1500, node_color="skyblue", pos=nx.circular_layout(G))
+    nx.draw(newG, with_labels=True, node_size=1500, node_color="skyblue", pos=nx.circular_layout(G))
 
     plt.show()   
 
@@ -105,7 +104,6 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
         verbose : "True" pour afficher le détail des itérations
         save : "True" pour enregistrer le tracé en format jpg
     """
-
     # Calcul de la taille nMaxAGlouton pour l'algorithme (G)
     # nMax : taille jusqu'à laquelle l'algorithme tourne rapidement, i.e temps G(nMax,p) < secondesMaxAutorises
     nMax = 0
@@ -143,7 +141,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
     y1 = []  # axe des ordonnées : liste des temps de calcul moyen, pour l'algorithme sélectionné(G)
     y2 = []  # axe des ordonnées : liste des tailles des couplages (nombre de sommets) moyen, pour l'algorithme sélectionné(G)
-    x = []  # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
+    x = []   # axe des abscisses : liste de "nombre de sommets" {1/10 nbIterations, 2/10 nbIterations, ... , nbIterations}
     
     # Pour chaque 1/10 de nMax
     for i in range(1, 11) :
@@ -251,8 +249,11 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
 # Méthode permet de supprimer un sommet d'un graphe G et d'obtenir le graphe G' résultant de la suppression du sommet v
 def suppSommet(initG, v) :
+    """ initG : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        v : un sommet à supprimer
+    """
     if v not in initG.keys() :
-        print("Le sommet", v, "n'est pas dans le graphe G. Le graphe G' est équivalent à G.\n")
+        print("\nLe sommet", v, "n'est pas dans le graphe G : le graphe G'=G\{v} est équivalent à G.\n")
         return initG
 
     # On réalise une copie de initG pour ne pas le modifier
@@ -285,6 +286,9 @@ def suppSommet(initG, v) :
 
 # Méthode permettant de supprimer plusieurs sommets à la fois d'un graphe G et d'obtenir le graphe G' résultant de la suppression des sommets
 def multSuppSommet(G, ensv) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        ensv : liste de sommets à supprimer
+    """
     modifG = copy.deepcopy(G)
 
     for v in ensv :
@@ -296,8 +300,9 @@ def multSuppSommet(G, ensv) :
 
 # Méthode renvoyant un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
 def degresSommet(G) :
-
-    # Création d'un tableau (dictionnaire) contenant les degres de chaque sommet du graphe G
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
+    # Création d'un dictionnaire 'tab' contenant les degres de chaque sommet du graphe G
     tab = dict()
     for v in G.keys() :
         tab[v] = len(list(G[v]))
@@ -306,22 +311,22 @@ def degresSommet(G) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant de retourner l'indice du sommet ayant le degres maximal dans le graphe G
+# Méthode permettant de retourner le sommet ayant le degre maximal dans le graphe G
 def sommetDegresMax(G) :
-
-    """ a) create a list of the dict's keys and values; 
-        b) return the key with the max value"""  
-    deg = degresSommet(G)
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
+    deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     v = list(deg.keys())
     return v[degres.index(max(degres))]
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant de retourner le degre maximum parmi les degres des sommets du graphe G
+# Méthode permettant de retourner le degre du sommet ayant le degre maximum dans le graphe G
 def valeurDegresMax(G) :
-
-    deg = degresSommet(G) # dictionnaire { nbSommet : sommetsAdjacents }
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
+    deg = degresSommet(G) # deg est un dictionnaire { nbSommet : sommetsAdjacents }
     degres = list(deg.values())
     return max(degres)
 
@@ -339,11 +344,11 @@ def randomGraphe(n, p) :
     # Création du graphe
     G = dict()
 
-    # Liste des sommets
+    # Creation de la liste des sommets
     for i in range(n) :
         G[i] = []
     
-    # Liste des aretesS
+    # Creation de la liste des aretes, ajoutées au graphe G suivant une probabilité p de présence
     for v1 in G.keys() :
         for v2 in G.keys() :
             if v1 != v2 :
@@ -370,9 +375,10 @@ def randomGraphe(n, p) :
 
 # Méthode representant l'algorithme de couplage sur le graphe G
 def algoCouplage(G) :
-    C = list() # Ensemble représentant le couplage
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
+    C = list()  # C = liste de sommets représentant le couplage
 
-    # Début de l'algorithme
     for s1 in list(G.keys()) :
         for s2 in list(G[s1]) :
             if (s1 not in C) and (s2 not in C) :
@@ -386,17 +392,25 @@ def algoCouplage(G) :
 
 # Méthode représentant l'algorithme glouton de couplage sur le graphe G
 def algoGlouton(G) :
-    C = [] # Ensemble représentant le couplage
-    copyG = copy.deepcopy(G) # On réalise une copie de G afin de ne pas modifier l'original
-    E = areteGraphe(copyG) # Liste des arêtes du graphe G
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+    """
+    C = []  # C = liste de sommets représentant le couplage
 
-    # Début de l'algorithme
+    # On réalise une copie de G afin de ne pas modifier l'original
+    copyG = copy.deepcopy(G)
+    E = aretesGrapheToList(copyG) # Liste des arêtes du graphe G
+
     while E != [] :
-        v = sommetDegresMax(copyG) # Sommet au degrès maximal
 
-        copyG = suppSommet(copyG, v) # On supprime ce sommet du graphe
-        C.append(v) # On ajoute le sommet à la couverture
-        E = [e for e in E if v not in e] # On supprime les arêtes couvertes par le sommet
+        # On determine le sommet de degrès maximal et on le supprime du graphe
+        v = sommetDegresMax(copyG)
+        copyG = suppSommet(copyG, v)
+
+        # On ajoute le sommet à la couverture
+        C.append(v)
+
+        # On supprime les arêtes couvertes par le sommet v
+        E = [e for e in E if v not in e]
 
     return C
 
@@ -406,23 +420,62 @@ def algoGlouton(G) :
 # METHODES PARTIE 4
 #######################################################################################################
 
-# Méthode réalisant le branchement de manière impartiale (sans indice)
+# Méthode réalisant le branchement simple
 def branchement(G, randomSelection=False, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        randomSelection : "True" si on veux dépiler les états de la pile en ordre aléatoire
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
-    if (areteGraphe(G) != []) :
-        areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe si elle existe
-    else :
-        return [n for n in G.keys()] # Sinon on renvoie l'ensemble des nodes de G
+    if G == {} :
+        print("Le graphe est vide, C = {}")
+        return -1
+
+    # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
+    optiC = algoCouplage(G)
+    
+    #  On récupère la première arete du graphe
+    areteInitiale = aretesGrapheToList(G)[0]
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G ]
-    statesToStudy = [] # Pile des états du branchement à étudier
-    statesToStudy.append([[areteInitiale[0]], suppSommet(G, areteInitiale[0])])
-    statesToStudy.append([[areteInitiale[1]], suppSommet(G, areteInitiale[1])])
+    statesToStudy = list() # Pile des états du branchement à étudier
+
+    if verbose:
+        print("Initialisation algorithme 'branchement' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
+
+
+    # Création des informations du noeud de droite
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
+    statesToStudy.insert(0, [[areteInitiale[1]], newGraphe])
+    nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[1]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[1]) +"} :", areteInitiale[1])
+        print("\n")
+
+
+    # Création des informations du noeud de gauche
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[0])
+    statesToStudy.insert(0, [[areteInitiale[0]], newGraphe])
+    nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteInitiale[0] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[0]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[0]) +"} :", areteInitiale[0])
+        print("\n")
+
 
     # Début de l'algorithme de branchement
-    while (statesToStudy != []) :
+    while (len(statesToStudy) != 0) :
 
         # Choix de la méthode de sélection d'état
         if (randomSelection) :
@@ -433,74 +486,106 @@ def branchement(G, randomSelection=False, verbose=False) :
             state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
+            print("Meilleure couverture optimale :", optiC)
+
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
-            # On récupère une arete aléatoire
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
-            leftNode = areteEtude[0]
-            rightNode = areteEtude[1]
+            # On récupère la première arete du graphe
+            areteEtude = aretesGrapheToList(state[1])[0]
+
+            # Calcul des informations du noeud de droite
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
+            statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe])
             nbNoeudsGeneres += 1
 
-            # On ajoute deux feuilles à la liste (on priorise le fils de gauche, soit le premier élément de l'arete étudiée)
-            statesToStudy.insert(0, [state[0] + [rightNode], suppSommet(state[1], rightNode)])
-            statesToStudy.insert(0, [state[0] + [leftNode], suppSommet(state[1], leftNode)])
-        
-    if (verbose) :
-        print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
+            if verbose :
+                print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
+                print("\t\tGraphe G\{" + str(areteEtude[1]) +"} :", newGraphe)
+                print("\t\tCouverture pour G\{" + str(areteEtude[1]) +"} :", state[0])
+                print("\n")
 
-    # On retourne C
+
+            # Calcul des informations du noeud de gauche
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[0])
+
+            statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe])
+            nbNoeudsGeneres += 1
+
+            if verbose :
+                print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteEtude[0] ,") :")
+                print("\t\tGraphe G\{" + str(areteEtude[0]) +"} :", newGraphe)
+                print("\t\tCouverture pour G\{" + str(areteEtude[0]) +"} :", state[0])
+                print("\n")
+
+    if verbose :
+        print("Nombre de noeuds générés avec la méthode 'branchement' :", nbNoeudsGeneres)
+        print("Couverture optimale retournée par la méthode 'branchement' :", optiC)
+
+    # On retourne la meilleure couverture trouvée
     return optiC
 
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant de calculer le max parmi les bornes b1, b2 et b3
 def calculBorneInf(G, verbose=False) :
-    b1 = 0 # Partie entière supérieure de m / delta (m = nombre aretes de G, delta = degrès maximum sommets du graphe)
-    b2 = 0 # Cardinalité de M (M un couplage de G)
-    b3 = 0 # Formule
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     l = []
 
-    # Calcul de M
-    M = algoCouplage(G) # M est un couplage de G
-    C = branchement(G, randomSelection=False) # C est une couverture de G
+    # Calcul de M, M est un couplage de G
+    M = algoCouplage(G)
 
     # Calcul de n, m et c
-    n = len(list(G.keys())) # nombre de sommets
-    m = len(areteGraphe(G)) # nombre d'aretes
-    c = len(C) # cardinalite de la couverture minimale
+    n = len(list(G.keys())) # n = nombre de sommets
+    m = len(aretesGrapheToList(G)) # m = nombre d'aretes
+    c = len(branchement(G, randomSelection=False)) # c = cardinalite de la couverture minimale de G donnée par l'algo branchement
 
-    # Calcul de b1
-    b1 = math.ceil(m / valeurDegresMax(G)) # Partie entière superieure de (m / valeurDegresMax)
+    # Calcul de b1 = partie entière supérieure de m / delta (m = nombre aretes de G, delta = degrès maximum sommets du graphe)
+    b1 = 0
+    b1 = math.ceil(m / valeurDegresMax(G))
     l.append(b1)
 
-    # Calcul de b2
+    # Calcul de b2 = cardinalité de M (M un couplage de G)
+    b2 = 0
     b2 = (len(M) / 2)
     l.append(b2)
     
     # Calcul de b3
+    b3 = 0
     b3 = (2*n-1-(math.sqrt( ((2*n-1)**2)-8*m) ))/2
     l.append(b3)
     
-    # Valeur maximale entre les bi
+    # Valeur maximale entre b1, b2, b3
     maxB = max(l)
-    if (verbose) :
-        print("b1 =", b1, "\nb2 =", b2, "\nb3 =", b3, "\n|C| =", c, "\n|C| >= max{b1,b2,b3} :\t", c, ">=", maxB)
 
-    # On retourne la valeur maximale
+    if (verbose) :
+        print("CalculBorneInf : b1 =", b1, "; b2 =", b2, "; b3 =", b3, "; |C| =", c,"\t------> |C| >= max{b1,b2,b3}\t<===>\t", c, ">=", maxB, "\n")
+
+    # On retourne la valeur maximale entre b1, b2, b3
     return maxB
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
+# Fonction réalisant le branchement avec bornes, qui associe à chaque noeud
+# le calcul d'une borne inférieure et d'un borne superieure (Exercice 4.2.2)
+# CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
+# CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
 def branchementBornesCouplage(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     if G == {} :
-        return "Le graphe est vide, C = {}"
+        print("Le graphe est vide, C = {}")
+        return -1
 
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
@@ -512,17 +597,18 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
-    # print("optic =", optiC)
 
     #  On récupère la première arete du graphe
-    areteInitiale = areteGraphe(G)[0]
-    # print("on choisit l'arete initiale", areteInitiale)
+    areteInitiale = aretesGrapheToList(G)[0]
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
     statesToStudy = list() # Pile des états du branchement à étudier
 
-    # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
-    # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
+    if verbose:
+        print("Initialisation algorithme 'branchementBornesCouplage' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
+
 
     # Création des informations du noeud de droite
     newGraphe = copy.deepcopy(G)
@@ -534,11 +620,19 @@ def branchementBornesCouplage(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    # print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
-        # print("on ajoute ce noeud droit")
+        nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[1]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[1]) +"} :", areteInitiale[1])
+        print("\t\tBorne inferieure =", newBorneInf)
+        print("\t\tBorne superieure =", newBorneSup)
+        print("\n")
+
 
     # Création des informations du noeud de gauche
     newGraphe = copy.deepcopy(G)
@@ -550,36 +644,38 @@ def branchementBornesCouplage(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    # print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         statesToStudy.insert(0, [[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
-        # print("on ajoute ce noeud gauche")
+        nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteInitiale[0] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[0]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[0]) +"} :", areteInitiale[0])
+        print("\t\tBorne inferieure =", newBorneInf)
+        print("\t\tBorne superieure =", newBorneSup)
+        print("\n")
 
 
     # Début de l'algorithme de branchement
-    i = 0    
     while (len(statesToStudy) != 0) :
-        i+=1
-        # print("\niteration n.", i)
 
         # On récupère la tete de la pile et on la supprime de statesToStudy
         state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-                # print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
+            print("Meilleure couverture optimale :", optiC)
+
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
 
-            # print(">>> G it.", i, ":", state[1] )
-
             # On récupère la première arete du branchement
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
-            # print("areteEtude", areteEtude)
+            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
 
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
@@ -591,12 +687,19 @@ def branchementBornesCouplage(G, verbose=False) :
             else :
                 newBorneInf = None
                 newBorneSup = None
-            # print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
-                # print("on ajoute ce noeud droit")
+
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[1]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[1]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
+
 
             # Calcul des informations du noeud de gauche
             newGraphe = copy.deepcopy(state[1])
@@ -608,28 +711,40 @@ def branchementBornesCouplage(G, verbose=False) :
             else :
                 newBorneInf = None
                 newBorneSup = None
-            # print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
-                # print("on ajoute ce noeud gauche")
 
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteEtude[0] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[0]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[0]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
 
-    if (verbose) :
-        print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
+    if verbose :
+        print("Nombre de noeuds générés avec la méthode 'branchementBornesCouplage' :", nbNoeudsGeneres)
+        print("Couverture optimale retournée par la méthode 'branchementBornesCouplage' :", optiC)
 
-    # On retourne C
+    # On retourne la meilleure couverture trouvée
     return optiC
 
 #------------------------------------------------------------------------------------------------------
 
-# Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
+# Fonction réalisant le branchement avec bornes optimisé (Exercice 4.3.1)
+# CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
+# CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
 def branchementOptimiseCouplage(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
     nbNoeudsGeneres = 1 # nombre de noeuds générés
 
     if G == {} :
-        return "Le graphe est vide, C = {}"
+        print("Le graphe est vide, C = {}")
+        return -1
 
     # On calcule la borne inférieure et la borne supérieure pour la racine
     rootBorneInf = calculBorneInf(G)
@@ -641,170 +756,26 @@ def branchementOptimiseCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
-    print("optic =", optiC)
 
     #  On récupère la première arete du graphe
-    areteInitiale = areteGraphe(G)[0]
-    print("on choisit l'arete initiale", areteInitiale)
+    areteInitiale = aretesGrapheToList(G)[0]
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
     statesToStudy = list() # Pile des états du branchement à étudier
 
-    # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
-    # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
+    if verbose:
+        print("Initialisation algorithme 'branchementOptimiseCouplage' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
+
 
     # Création des informations du noeud de droite
     newGraphe = copy.deepcopy(G)
-
-    voisinsU = newGraphe[areteInitiale[0]]
-    print("voisinsU", voisinsU)
-
-    newGraphe = suppSommet(newGraphe, areteInitiale[0])
-    for s in voisinsU:
-        newGraphe = suppSommet(newGraphe, s)
-    
-    if not (newGraphe == {}):
-        newBorneInf = calculBorneInf(newGraphe) + 1
-        newBorneSup = len(algoCouplage(newGraphe))
-    else :
-        newBorneInf = None
-        newBorneSup = None
-    print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
-
-    if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-        statesToStudy.insert(0, [[areteInitiale[1]] + voisinsU, newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud droit, c =", statesToStudy[0][0])
-
-    # Création des informations du noeud de gauche
-    newGraphe = copy.deepcopy(G)
-    newGraphe = suppSommet(newGraphe, areteInitiale[0])
-
-    if not (newGraphe == {}):
-        newBorneInf = calculBorneInf(newGraphe) + 1
-        newBorneSup = len(algoCouplage(newGraphe))
-    else :
-        newBorneInf = None
-        newBorneSup = None
-    print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
-
-    if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-        statesToStudy.insert(0, [[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud gauche")
-
-
-    # Début de l'algorithme de branchement
-    i = 0    
-    while (len(statesToStudy) != 0) :
-        i+=1
-        print("\niteration n.", i)
-
-        # On récupère la tete de la pile et on la supprime de statesToStudy
-        state = statesToStudy.pop(0)
-
-        # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
-            if (optiC == None) or (len(state[0]) < len(optiC)) :
-                optiC = state[0]
-                print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
-
-        # Cas où G (state[1]) n'est pas un graphe sans aretes
-        else :
-
-            print(">>> G it.", i, ":", state[1] )
-
-            # On récupère la première arete du branchement
-            areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
-            print("areteEtude", areteEtude)
-
-            # Calcul des informations du noeud de droite
-            newGraphe = copy.deepcopy(state[1])
-            voisinsU = newGraphe[areteEtude[0]]
-
-            for s in voisinsU:
-                newGraphe = suppSommet(newGraphe, s)
-
-            if not (newGraphe == {}):
-                newBorneInf = calculBorneInf(newGraphe)
-                newBorneSup = len(algoCouplage(newGraphe))
-            else :
-                newBorneInf = None
-                newBorneSup = None
-            print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
-
-            if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-                statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
-                nbNoeudsGeneres += 1
-                print("on ajoute ce noeud droit")
-
-            # Calcul des informations du noeud de gauche
-            newGraphe = copy.deepcopy(state[1])
-            newGraphe = suppSommet(newGraphe, areteEtude[0])
-
-            if not (newGraphe == {}):
-                newBorneInf = calculBorneInf(newGraphe)
-                newBorneSup = len(algoCouplage(newGraphe))
-            else :
-                newBorneInf = None
-                newBorneSup = None
-            print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
-
-            if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
-                statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
-                nbNoeudsGeneres += 1
-                print("on ajoute ce noeud gauche")
-
-
-    if (verbose) :
-        print("Nombre de noeuds générés avec la méthode 'branchementBornesCouplage' :", nbNoeudsGeneres)
-
-    # On retourne C
-    return optiC
-
-#------------------------------------------------------------------------------------------------------
-
-# Fonction réalisant le branchement2, qui insère le calcul en chaque noeud d'une solution réalisable et le calcul d'une borne inférieure
-def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
-    nbNoeudsGeneres = 1 # nombre de noeuds générés
-
-    if G == {} :
-        return "Le graphe est vide, C = {}"
-
-    # On calcule la borne inférieure et la borne supérieure pour la racine
-    rootBorneInf = calculBorneInf(G)
-    rootBorneSup = len(algoCouplage(G))
-
-    # Dans le cas où les deux bornes sont égales, on retourne immédiatement la solution
-    if (rootBorneInf >= rootBorneSup) :
-        return algoCouplage(G)
-
-    # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
-    optiC = algoCouplage(G)
-    print("optic =", optiC)
-
-    #  On récupère la premiere arete du graphe
-    uDegreMax = sommetDegresMax(G)
-    Gprime = {}
-    Gprime[uDegreMax] = G[uDegreMax]
-    areteInitiale = areteGraphe(Gprime)[0]
-    print("on choisit l'arete initiale", areteInitiale)
-
-    # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
-    statesToStudy = list() # Pile des états du branchement à étudier
-
-    # CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
-    # CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
-
-    # Création des informations du noeud de droite
-    newGraphe = copy.deepcopy(G)
-    print("G init :", newGraphe)
     newGraphe = suppSommet(newGraphe, areteInitiale[1])
-    print("G modif1 :", newGraphe)
 
     if not newGraphe == {}:
         voisinsU = newGraphe[areteInitiale[0]]
-        print("voisinsU", voisinsU)
         for s in voisinsU:
-            print("on enleve le voisin de u ", s)
             if s in newGraphe:
                 newGraphe = suppSommet(newGraphe, s)
     else :
@@ -816,14 +787,21 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         if voisinsU != None:
             statesToStudy.insert(0, [[[areteInitiale[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
         else:
             statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud droit, c =", statesToStudy[0][0])
+        nbNoeudsGeneres += 1 
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[1]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[1]) +"} :", areteInitiale[1])
+        print("\t\tBorne inferieure =", newBorneInf)
+        print("\t\tBorne superieure =", newBorneSup)
+        print("\n")
 
 
     # Création des informations du noeud de gauche
@@ -836,70 +814,71 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         statesToStudy.insert(0, [[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud gauche")
+        nbNoeudsGeneres += 1
+
+    if verbose :
+        print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteInitiale[0] ,") :")
+        print("\t\tGraphe G\{" + str(areteInitiale[0]) +"} :", newGraphe)
+        print("\t\tCouverture pour G\{" + str(areteInitiale[0]) +"} :", areteInitiale[0])
+        print("\t\tBorne inferieure =", newBorneInf)
+        print("\t\tBorne superieure =", newBorneSup)
+        print("\n")
 
 
     # Début de l'algorithme de branchement
-    i = 0    
     while (len(statesToStudy) != 0) :
-        i+=1
-        print("\niteration n.", i)
 
         # On récupère la tete de la pile et on la supprime de statesToStudy
         state = statesToStudy.pop(0)
 
         # Cas où G (state[1]) est un graphe sans aretes
-        if (areteGraphe(state[1]) == []) :
+        if (aretesGrapheToList(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-                print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
+            print("Meilleure couverture optimale :", optiC)
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
 
-            print(">>> G it.", i, ":", state[1] )
-
             # On récupère la première arete du branchement
-            uDegreMax = sommetDegresMax(state[1])
-            Gprime = {}
-            Gprime[uDegreMax] = (state[1])[uDegreMax]
-            areteEtude = areteGraphe(Gprime)[0] # On récupère la  arete du graphe avec max d
-            print("areteEtude", areteEtude)
+            areteEtude = aretesGrapheToList(state[1])[0] # On récupère la première arete du graphe
 
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
             newGraphe = suppSommet(newGraphe, areteEtude[1])
-            print("G modif sans v =", areteEtude[1], "G =", newGraphe)
 
             if not newGraphe == {}:
                 voisinsU = newGraphe[areteEtude[0]]
-                print("voisinsU", voisinsU)
                 for s in voisinsU:
-                    print("on enleve le voisin de u ", s)
                     if s in newGraphe:
                         newGraphe = suppSommet(newGraphe, s)
-                print("G modif2 :", newGraphe)
             else :
                 voisinsU = None
- 
+
             if not (newGraphe == {}):
-                newBorneInf = calculBorneInf(newGraphe) + 1
+                newBorneInf = calculBorneInf(newGraphe)
                 newBorneSup = len(algoCouplage(newGraphe))
             else :
                 newBorneInf = None
                 newBorneSup = None
-            print("niveau node droite I : arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 if voisinsU != None:
                     statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
                 else:
                     statesToStudy.insert(0, [[state[0] + [areteEtude[1]]], newGraphe, newBorneInf, newBorneSup])
-                print("on ajoute ce noeud droit, c =", statesToStudy[0][0])
+                nbNoeudsGeneres += 1    
+
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[1]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[1]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
 
 
             # Calcul des informations du noeud de gauche
@@ -912,130 +891,216 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
             else :
                 newBorneInf = None
                 newBorneSup = None
-            print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
-                print("on ajoute ce noeud gauche")
 
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteEtude[0] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[0]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[0]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
 
-    if (verbose) :
-        print("Nombre de noeuds générés avec la méthode 'branchement2' :", nbNoeudsGeneres)
+    if verbose :
+        print("Nombre de noeuds générés avec la méthode 'branchementOptimiseCouplage' :", nbNoeudsGeneres)
+        print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage' :", optiC)
 
-    # On retourne C
+    # On retourne la meilleure couverture trouvée
     return optiC
 
-#######################################################################################################
-# TESTS
-#######################################################################################################
-
-# Instanciation d'un graphe G (modelisation : dictionnaire)
-# G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
-# showGraphe(convertGraph(G))
-
-# Instanciation d'un graphe G (modelisation : librairie graphe networkx)
-# V = [0, 1, 2, 3]
-# E = [(0,1), (0,2), (0,3), (1,2)]
-
-# G = nx.Graph()
-# G.add_nodes_from(V) # sommets
-# G.add_edges_from(E) # aretes
-# showGraphe(G)
-
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode suppSommet
-# print("Graphe G\n", G, "\n")
-# newG = suppSommet(G, 0)
-# print("Graphe G'\n", newG, "\n")
+# Fonction réalisant le branchement avec bornes optimisé, sans traiter u dans la branche droite (Exercice 4.3.2)
+# CONDITION POUR ELAGUER : (BORNE SUP < BORNE INF) ou (BORNE INF > TAILLE OPTI_C)
+# CONDITIONS DE REUSSITE : (BORNE SUP >= BORNE INF) ou (BORNE INF <= TAILLE OPTI_C)
+def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
+    """ G : un dictionnaire representant un graphe { sommet s : sommets adjacents à s}
+        verbose : "True" pour afficher le détail des itérations
+    """
+    nbNoeudsGeneres = 1 # nombre de noeuds générés
 
-#------------------------------------------------------------------------------------------------------
+    if G == {} :
+        print("Le graphe est vide, C = {}")
+        return -1
 
-# Test méthode multSuppSommet
-# newG = multSuppSommet(G, [0, 1])
-# print("Graphe G'\n", newG, "\n")
+    # On calcule la borne inférieure et la borne supérieure pour la racine
+    rootBorneInf = calculBorneInf(G)
+    rootBorneSup = len(algoCouplage(G))
 
-#------------------------------------------------------------------------------------------------------
+    # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
+    optiC = algoCouplage(G)
 
-# Tests des méthodes degresSommet et sommetDegresSommet
-# print(degresSommet(G))
-# print(sommetDegresMax(G))
+    # Dans le cas où les deux bornes sont égales, on retourne immédiatement la solution
+    if (rootBorneInf >= rootBorneSup) :
+        if verbose :
+            print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
+        return optiC
 
-#------------------------------------------------------------------------------------------------------
+    #  On récupère la premiere arete du graphe
+    uDegreMax = sommetDegresMax(G)
+    Gprime = {}
+    Gprime[uDegreMax] = G[uDegreMax]
+    areteInitiale = aretesGrapheToList(Gprime)[0]
 
-# Tests sur la génération aléatoire de graphe
-# randG = randomGraphe(8, 0.1)
-# print("Graphe G\n", randG, "\n")
-# showGraphe(convertGraph(randG))
+    # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
+    statesToStudy = list() # Pile des états du branchement à étudier
 
-#------------------------------------------------------------------------------------------------------
+    if verbose:
+        print("Initialisation algorithme 'branchementOptimiseCouplage_uDegreMax' :")
+        print("\t\tSolution optimale de la racine :", optiC)
+        print("\t\tArete à traiter :", areteInitiale)
 
-# Tests sur l'algorithme de couplage
-# G = randomGraphe(8, 0.2)
-# print(algoCouplage(G))
-# print(areteGraphe(G))
-# showGraphe(convertGraph(G))
 
-#------------------------------------------------------------------------------------------------------
+    # Création des informations du noeud de droite
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[1])
 
-# Tests sur l'algorithme de couplage glouton
-# G = randomGraphe(20, 0.5)
-# print(algoGlouton(G))
-# showGraphe(convertGraph(G))
+    if not newGraphe == {}:
+        voisinsU = newGraphe[areteInitiale[0]]
+        for s in voisinsU:
+            if s in newGraphe:
+                newGraphe = suppSommet(newGraphe, s)
+    else :
+        voisinsU = None
 
-#------------------------------------------------------------------------------------------------------
+    if not (newGraphe == {}):
+        newBorneInf = calculBorneInf(newGraphe) + 1
+        newBorneSup = len(algoCouplage(newGraphe))
+    else :
+        newBorneInf = None
+        newBorneSup = None
 
-# Tests de comparaison d'efficacité des 2 algorithmes
+    if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
+        if voisinsU != None:
+            statesToStudy.insert(0, [[[areteInitiale[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+        else:
+            statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
+        nbNoeudsGeneres += 1
 
-#------------------------------------------------------------------------------------------------------
+        if verbose :
+            print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteInitiale[1] ,") :")
+            print("\t\t[Debug] Liste des voisins du sommet u", voisinsU)
+            print("\t\tGraphe G\{" + str(areteInitiale[1]) +"} :", newGraphe)
+            print("\t\tCouverture pour G\{" + str(areteInitiale[1]) +"} :", areteInitiale[1])
+            print("\t\tBorne inferieure =", newBorneInf)
+            print("\t\tBorne superieure =", newBorneSup)
+            print("\n")
 
-# Test méthode acquisitionGraphe depuis un fichier texte
-# G = acquisitionGraphe("exempleinstance.txt")
-# print("G = ", G, "\n")
-# showGraphe(convertGraph(G))
 
-#------------------------------------------------------------------------------------------------------
+    # Création des informations du noeud de gauche
+    newGraphe = copy.deepcopy(G)
+    newGraphe = suppSommet(newGraphe, areteInitiale[0])
 
-# Test méthodes plotPerformances sur Couplage et Glouton
-plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
-plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
+    if not (newGraphe == {}):
+        newBorneInf = calculBorneInf(newGraphe) + 1
+        newBorneSup = len(algoCouplage(newGraphe))
+    else :
+        newBorneInf = None
+        newBorneSup = None
 
-#------------------------------------------------------------------------------------------------------
+    if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
+        statesToStudy.insert(0, [[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
+        nbNoeudsGeneres += 1
+        
+        if verbose :
+            print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteInitiale[0] ,") :")
+            print("\t\tGraphe G\{" + str(areteInitiale[0]) +"} :", newGraphe)
+            print("\t\tCouverture pour G\{" + str(areteInitiale[0]) +"} :", areteInitiale[0])
+            print("\t\tBorne inferieure =", newBorneInf)
+            print("\t\tBorne superieure =", newBorneSup)
+            print("\n")
 
-# Test sur la méthode de branchement
-# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
 
-# print(valeurDegresMax(G))
-# calculBornesInf(G)
+    # Début de l'algorithme de branchement
+    while (len(statesToStudy) != 0) :
 
-#------------------------------------------------------------------------------------------------------
+        # On récupère la tete de la pile et on la supprime de statesToStudy
+        state = statesToStudy.pop(0)
 
-# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
-# plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
-# plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
+        # Cas où G (state[1]) est un graphe sans aretes
+        if (aretesGrapheToList(state[1]) == []) :
+            if (optiC == None) or (len(state[0]) < len(optiC)) :
+                optiC = state[0]
+            print("Meilleure couverture optimale :", optiC)
 
-#------------------------------------------------------------------------------------------------------
+        # Cas où G (state[1]) n'est pas un graphe sans aretes
+        else :
 
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
-# print(valeurDegresMax(G))
+            # On récupère la première arete du branchement
+            uDegreMax = sommetDegresMax(state[1])
+            Gprime = {}
+            Gprime[uDegreMax] = (state[1])[uDegreMax]
+            areteEtude = aretesGrapheToList(Gprime)[0] # On récupère la  arete du graphe avec max d
 
-#------------------------------------------------------------------------------------------------------
+            # Calcul des informations du noeud de droite
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[1])
 
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
-#showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+            if not newGraphe == {}:
+                voisinsU = newGraphe[areteEtude[0]]
+                for s in voisinsU:
+                    if s in newGraphe:
+                        newGraphe = suppSommet(newGraphe, s)
+            else :
+                voisinsU = None
+ 
+            if not (newGraphe == {}):
+                newBorneInf = calculBorneInf(newGraphe) + 1
+                newBorneSup = len(algoCouplage(newGraphe))
+            else :
+                newBorneInf = None
+                newBorneSup = None
 
-#------------------------------------------------------------------------------------------------------
-# print("--------------------------------------------------------")
-# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
-# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
-# showGraphe(convertGraph(acquisitionGraphe("exempleinstance.txt")))
+            if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
+                if voisinsU != None:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]] + voisinsU], newGraphe, newBorneInf, newBorneSup])
+                else:
+                    statesToStudy.insert(0, [[state[0] + [areteEtude[1]]], newGraphe, newBorneInf, newBorneSup])
+                nbNoeudsGeneres += 1
+
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche droite (branchement v =", areteEtude[1] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[1]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[1]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
+
+            # Calcul des informations du noeud de gauche
+            newGraphe = copy.deepcopy(state[1])
+            newGraphe = suppSommet(newGraphe, areteEtude[0])
+
+            if not (newGraphe == {}):
+                newBorneInf = calculBorneInf(newGraphe)
+                newBorneSup = len(algoCouplage(newGraphe))
+            else :
+                newBorneInf = None
+                newBorneSup = None
+
+            if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
+                statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
+                nbNoeudsGeneres += 1
+
+                if verbose :
+                    print("Ajout du noeud n.", nbNoeudsGeneres, "dans la branche gauche (branchement u =", areteEtude[0] ,") :")
+                    print("\t\tGraphe G\{" + str(areteEtude[0]) +"} :", newGraphe)
+                    print("\t\tCouverture pour G\{" + str(areteEtude[0]) +"} :", state[0])
+                    print("\t\tBorne inferieure =", newBorneInf)
+                    print("\t\tBorne superieure =", newBorneSup)
+                    print("\n")
+
+    if verbose :
+        print("Nombre de noeuds générés avec la méthode 'branchementOptimiseCouplage_uDegreMax' :", nbNoeudsGeneres)
+        print("Couverture optimale retournée par la méthode 'branchementOptimiseCouplage_uDegreMax' :", optiC)
+
+    # On retourne la meilleure couverture trouvée
+    return optiC
+
+
+
 
 
 #######################################################################################################
@@ -1047,8 +1112,12 @@ plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
 
 # Méthode d'évaluation permettant de réaliser les tests
 def evaluationAlgorithm(n, p, a) :
-    # a = permet de choisir l'algorithme à utiliser
-
+    """ n : nombre de sommets, n > 0
+        p : la probabilité qu'une arete entre 2 sommet soit créée, p E ]0,1[
+        a : valeur qui permet de choisir l'algorithme à utiliser :
+                1 = Test de branchement (4.1)
+                2 = Test de branchementBornesCouplage (4.2.2)
+    """
     # a = 1 - Test de branchement (4.1)
     if (a == 1) :
         print("EVALUATION - Algorithme : branchement (4.1).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
@@ -1059,9 +1128,9 @@ def evaluationAlgorithm(n, p, a) :
         execTime = endTime - startTime
         print("Temps d'exécution =", execTime, "secondes.\n")
 
-    # a = 2 - Test de branchementBornesCouplage (4.2)
+    # a = 2 - Test de branchementBornesCouplage (4.2.2)
     elif (a == 2) :
-        print("EVALUATION - Algorithme : branchementBornesCouplage (4.2).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
+        print("EVALUATION - Algorithme : branchementBornesCouplage (4.2.2).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
         testGraphe = randomGraphe(n,p)
         startTime = time.time()
         solution = branchementBornesCouplage(testGraphe, verbose=True)
@@ -1073,7 +1142,140 @@ def evaluationAlgorithm(n, p, a) :
     else :
         print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
 
-#------------------------------------------------------------------------------------------
+
+
+
+
+#######################################################################################################
+# TESTS
+#######################################################################################################
+
+# Instanciation d'un graphe G (modelisation : dictionnaire)
+# G = {0 : [1, 2, 3], 1 : [0, 2], 2 : [0, 1], 3 : [0]}
+# showGraphe(G)
+
+# Instanciation d'un graphe G (modelisation : librairie graphe networkx)
+# V = [0, 1, 2, 3]
+# E = [(0,1), (0,2), (0,3), (1,2)]
+
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode suppSommet
+# print("Graphe G\n", G, "\n")
+# newG = suppSommet(G, 0)
+# print("Graphe G'\n", newG, "\n")
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode multSuppSommet
+# newG = multSuppSommet(G, [0, 1])
+# print("Graphe G'\n", newG, "\n")
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests des méthodes degresSommet et sommetDegresSommet
+# print(degresSommet(G))
+# print(sommetDegresMax(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur la génération aléatoire de graphe
+# G = randomGraphe(8, 0.1)
+# print("Graphe G = ", G, "\n")
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage
+# G = randomGraphe(8, 0.2)
+# print(algoCouplage(G))
+# print(aretesGrapheToList(G))
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Tests sur l'algorithme de couplage glouton
+# G = randomGraphe(20, 0.5)
+# print(algoGlouton(G))
+# showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthode acquisitionGraphe depuis un fichier texte
+G = acquisitionGraphe("exempleinstance.txt")
+print("G = ", G, "\n")
+showGraphe(G)
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthodes plotPerformances sur Couplage et Glouton
+<<<<<<< HEAD
+plotPerformances(0.7, 15, 0.1, 1, verbose=True, save=True)
+plotPerformances(0.7, 15, 0.1, 2, verbose=True, save=True)
+=======
+# plotPerformances(0.3, 15, 0.01, 1, verbose=True, save=True)
+# plotPerformances(0.3, 15, 0.01, 2, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
+>>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement
+# print(branchement(acquisitionGraphe("exempleinstance.txt"), randomSelection=False))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+
+# print("ValeurDegresMax = ", valeurDegresMax(G))
+# print("calculBornesInf =", calculBornesInf(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test méthodes plotPerformancesCouplage et plotPerformancesGlouton
+<<<<<<< HEAD
+# plotPerformances(0.2, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.5, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.9, 10, 3, 3, verbose=True, save=True)
+# plotPerformances(0.22, 10, 3, 3, verbose=True, save=True)
+=======
+# plotPerformances(0.2, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.5, 15, 0.01, 3, verbose=True, save=True)
+# plotPerformances(0.9, 15, 0.01, 3, verbose=True, save=True)
+# print("\n----------------------------------------------------------------------------------------\n")
+>>>>>>> d13ba7173f47dc01751720e23f0a21974a630c9f
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementBornesCouplage(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print(valeurDegresMax(G))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementOptimiseCouplage(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test sur la méthode de branchement utilisant les bornes et l'algorithme de couplage standart
+# print(branchementOptimiseCouplage_uDegreMax(acquisitionGraphe("exempleinstance.txt")))
+# showGraphe(acquisitionGraphe("exempleinstance.txt"))
+# print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
 
 # Evalutation de branchement (question 4.1)
 # n = 20 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
@@ -1081,3 +1283,4 @@ def evaluationAlgorithm(n, p, a) :
 # for i in range(d) :
 #     numberOfNodes = (int)(n * ((i + 1) / d))
 #     evaluationAlgorithm(numberOfNodes, 0.2, 1)
+# print("\n----------------------------------------------------------------------------------------\n")
