@@ -263,7 +263,7 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 
 #------------------------------------------------------------------------------------------------------
 
-# Méthode permettant d'afficher un graphique de comparaison des performances ("temps de calcul" et "qualité des Solutions") de l'algorithme choisi
+# Méthode permettant d'afficher le rapport d'approximation de algoCouplage et algoGlouton
 def plotRapportApproximation(nMax, p, nbIterations, verbose = False, save = False):
     """ nMax : nombre de noeuds maximale pour le graphe
         p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
