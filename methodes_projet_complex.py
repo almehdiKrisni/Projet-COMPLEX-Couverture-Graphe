@@ -293,7 +293,7 @@ def plotRapportApproximation(nMax, p, mode, verbose = False, save = False):
             print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
             return
 
-        opt = len(branchement(G))
+        opt = len(branchementOptimiseCouplage_uDegreMax(G))
 
         if opt != 0 :
             r = res/opt
