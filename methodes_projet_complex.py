@@ -460,7 +460,10 @@ def branchement(G, randomSelection=False, verbose=False) :
     nbNoeudsGeneres = 0 # nombre de noeuds générés
     optiC = None # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
 
-    areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe
+    if (areteGraphe(G) != []) :
+        areteInitiale = areteGraphe(G)[0] # On récupère la première arete du graphe si elle existe
+    else :
+        return optiC # Sinon on renvoie l'ensemble des nodes de G
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G ]
     statesToStudy = [] # Pile des états du branchement à étudier
@@ -558,11 +561,11 @@ def branchementBornesCouplage(G, verbose=False) :
 
     # optiC = ensemble de sommets représentant la solution optimale (on cherche à minimiser la taille de la couverture)
     optiC = algoCouplage(G)
-    print("optic =", optiC)
+    # print("optic =", optiC)
 
     #  On récupère la première arete du graphe
     areteInitiale = areteGraphe(G)[0]
-    print("on choisit l'arete initiale", areteInitiale)
+    # print("on choisit l'arete initiale", areteInitiale)
 
     # Un état est de la forme [ Couverture C actuelle, Dictionnaire de graphe G , Borne Inf , Borne Sup]
     statesToStudy = list() # Pile des états du branchement à étudier
@@ -580,11 +583,11 @@ def branchementBornesCouplage(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+    # print("niveau node droite I : arete =", areteInitiale, "v =", areteInitiale[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         statesToStudy.insert(0, [[areteInitiale[1]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud droit")
+        # print("on ajoute ce noeud droit")
 
     # Création des informations du noeud de gauche
     newGraphe = copy.deepcopy(G)
@@ -596,18 +599,18 @@ def branchementBornesCouplage(G, verbose=False) :
     else :
         newBorneInf = None
         newBorneSup = None
-    print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+    # print("niveau node gauche I : arete =", areteInitiale, "u =", areteInitiale[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
     if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
         statesToStudy.insert(0, [[areteInitiale[0]], newGraphe, newBorneInf, newBorneSup])
-        print("on ajoute ce noeud gauche")
+        # print("on ajoute ce noeud gauche")
 
 
     # Début de l'algorithme de branchement
     i = 0    
     while (len(statesToStudy) != 0) :
         i+=1
-        print("\niteration n.", i)
+        # print("\niteration n.", i)
 
         # On récupère la tete de la pile et on la supprime de statesToStudy
         state = statesToStudy.pop(0)
@@ -616,16 +619,16 @@ def branchementBornesCouplage(G, verbose=False) :
         if (areteGraphe(state[1]) == []) :
             if (optiC == None) or (len(state[0]) < len(optiC)) :
                 optiC = state[0]
-                print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
+                # print(">>> c est une feuille, plus d aretes dans E, optiC =", optiC)
 
         # Cas où G (state[1]) n'est pas un graphe sans aretes
         else :
 
-            print(">>> G it.", i, ":", state[1] )
+            # print(">>> G it.", i, ":", state[1] )
 
             # On récupère la première arete du branchement
             areteEtude = areteGraphe(state[1])[0] # On récupère la première arete du graphe
-            print("areteEtude", areteEtude)
+            # print("areteEtude", areteEtude)
 
             # Calcul des informations du noeud de droite
             newGraphe = copy.deepcopy(state[1])
@@ -637,12 +640,12 @@ def branchementBornesCouplage(G, verbose=False) :
             else :
                 newBorneInf = None
                 newBorneSup = None
-            print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+            # print("niveau node droite it.", i, ": arete =", areteEtude, "v =", areteEtude[1], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[1]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
-                print("on ajoute ce noeud droit")
+                # print("on ajoute ce noeud droit")
 
             # Calcul des informations du noeud de gauche
             newGraphe = copy.deepcopy(state[1])
@@ -654,12 +657,12 @@ def branchementBornesCouplage(G, verbose=False) :
             else :
                 newBorneInf = None
                 newBorneSup = None
-            print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
+            # print("niveau node gauche it.", i, ": arete =", areteEtude, "u =", areteEtude[0], "newG =", newGraphe, "bornes Inf sup =", newBorneInf, newBorneSup )
 
             if (newBorneInf != None and not(newBorneSup < newBorneInf or newBorneInf > len(optiC))) :
                 statesToStudy.insert(0, [state[0] + [areteEtude[0]], newGraphe, newBorneInf, newBorneSup])
                 nbNoeudsGeneres += 1
-                print("on ajoute ce noeud gauche")
+                # print("on ajoute ce noeud gauche")
 
 
     if (verbose) :
@@ -827,7 +830,7 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
     optiC = algoCouplage(G)
     print("optic =", optiC)
 
-    #  On récupère la llllllllllllllllllllllllllllllllllllllllllllllllllllllarete du graphe
+    #  On récupère la premiere arete du graphe
     uDegreMax = sommetDegresMax(G)
     Gprime = {}
     Gprime[uDegreMax] = G[uDegreMax]
@@ -1023,8 +1026,8 @@ def branchementOptimiseCouplage_uDegreMax(G, verbose=False) :
 #------------------------------------------------------------------------------------------------------
 
 # Test méthode acquisitionGraphe depuis un fichier texte
-G = acquisitionGraphe("exempleinstance.txt")
-print("G = ", G, "\n")
+# G = acquisitionGraphe("exempleinstance.txt")
+# print("G = ", G, "\n")
 # showGraphe(convertGraph(G))
 
 #------------------------------------------------------------------------------------------------------
@@ -1083,14 +1086,24 @@ def evaluationAlgorithm(n, p, a) :
         execTime = endTime - startTime
         print("Temps d'exécution =", execTime, "secondes.\n")
 
+    # a = 2 - Test de branchementBornesCouplage (4.2)
+    elif (a == 2) :
+        print("EVALUATION - Algorithme : branchementBornesCouplage (4.2).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
+        testGraphe = randomGraphe(n,p)
+        startTime = time.time()
+        solution = branchementBornesCouplage(testGraphe, verbose=True)
+        endTime = time.time()
+        execTime = endTime - startTime
+        print("Temps d'exécution =", execTime, "secondes.\n")
+
     # La valeur de a ne correspond à aucun algorithme
     else :
         print("EVALUATION - Aucun algorithme correspondant.\nVeuillez choisir une valeur de a différente.")
 
 # Evalutation de branchement (question 4.1)
-n = 1000 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
+n = 100 # Il est recommandé de choisir une valeur de n divisible par d pour faciliter les calculs
 d = 10 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
 for i in range(d) :
     numberOfNodes = (int)(n * ((i + 1) / d))
-    evaluationAlgorithm(numberOfNodes, 0.9, 1)
+    evaluationAlgorithm(numberOfNodes, 0.2, 2)
 
