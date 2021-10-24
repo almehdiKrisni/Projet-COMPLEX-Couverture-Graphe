@@ -1078,7 +1078,7 @@ def evaluationAlgorithm(n, p, a) :
         print("EVALUATION - Algorithme : branchement (4.1).\nDébut de l'évaluation des performances pour :\nn =", n, "\tp =", p)
         testGraphe = randomGraphe(n,p)
         startTime = time.time()
-        solution = branchement(G)
+        solution = branchement(testGraphe)
         endTime = time.time()
         execTime = endTime - startTime
         print("Temps d'exécution =", execTime, "secondes.\n")
@@ -1092,5 +1092,5 @@ n = 1000 # Il est recommandé de choisir une valeur de n divisible par d pour fa
 d = 10 # Facteur de division de la valeur de n (plus d est elevé, plus le nombre de tests est élevé)
 for i in range(d) :
     numberOfNodes = (int)(n * ((i + 1) / d))
-    evaluationAlgorithm(numberOfNodes, 0.5, 1)
+    evaluationAlgorithm(numberOfNodes, 0.9, 1)
 
