@@ -264,10 +264,9 @@ def plotPerformances(p, nbIterations, secondesMaxAutorises, mode, verbose = Fals
 #------------------------------------------------------------------------------------------------------
 
 # Méthode permettant d'afficher le rapport d'approximation de algoCouplage et algoGlouton
-def plotRapportApproximation(nMax, p, nbIterations, mode, verbose = False, save = False):
+def plotRapportApproximation(nMax, p, mode, verbose = False, save = False):
     """ nMax : nombre de noeuds maximale pour le graphe
         p : la probabilité qu'une arete entre 2 sommets soit crée, p E ]0,1[
-        nbIterations : nombre d'éxecutions de l'algorithme, dans le but d'en déduir une performance moyenne
         mode : valeur déterminant l'algorithme allant etre utilisé, 1 = algoCouplage ; 2 = algoGlouton
         verbose : "True" pour afficher le détail des itérations
         save : "True" pour enregistrer le tracé en format jpg
@@ -278,45 +277,32 @@ def plotRapportApproximation(nMax, p, nbIterations, mode, verbose = False, save 
     # Pour chaque 1/10 de nMax
     for i in range(1, 11) :
 
-        tabRappApprox = []
-        
-        # Pour chacune des nbIterations démandées en paramètre
-        for ite in range(nbIterations):
-            r = -1
-            res = -1
+        r = -1
+        res = -1
 
-            # Méthode permettant de générer des graphes aléatoires
-            G = randomGraphe(int(nMax * (i / 10)), p)
+        # Méthode permettant de générer des graphes aléatoires
+        G = randomGraphe(int(nMax * (i / 10)), p)
 
-            # Calcul du rapport d'approximation r
-            # mode : 1 = algoCouplage ; 2 = algoGlouton
-            if (mode == 1) :
-                res = len(algoCouplage(G))
-            elif (mode == 2) :
-                res = len(algoGlouton(G))
-            else :
-                print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
-                return
-
-            opt = len(branchement(G))
-
-            if opt != 0 :
-                r = res/opt
-                tabRappApprox.append(r)
-
-            if verbose : 
-                print("x = ", i, "/10 nMax, iteration n.", ite+1, ":", "\n\t\tRapport d'approximation :", r, "\n")
-
-        if len(tabRappApprox) != 0 :
-            moyR = sum(tabRappApprox)/len(tabRappApprox)
+        # Calcul du rapport d'approximation r
+        # mode : 1 = algoCouplage ; 2 = algoGlouton
+        if (mode == 1) :
+            res = len(algoCouplage(G))
+        elif (mode == 2) :
+            res = len(algoGlouton(G))
         else :
-            moyR = -1
+            print("Aucun mode ne correspond à la valeur passée en paramètre. Veuillez choisir une autre valeur de mode.")
+            return
+
+        opt = len(branchementOptimiseCouplage_uDegreMax(G))
+
+        if opt != 0 :
+            r = res/opt
         
-        y.append(moyR)
+        y.append(r)
         x.append(int(nMax * (i / 10)))
 
         if verbose : 
-            print("\nx = ", i, "/10 nMax (" + str(int(nbIterations * i/10)) + ")\n\t\tRapport d'approximation :", r, "\n")
+            print("\nx = ", i, "/10 nMax\n\t\tRapport d'approximation :", r, "\n")
             print("----------------------------------------------------------------------------------------------\n")
 
 
@@ -1362,16 +1348,18 @@ def evaluationAlgorithm(n, p, a) :
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances sur les algorithmes de branchement bornesCouplage
-# plotPerformances(0.3, 1, 1, 4, verbose=True, save=True)
-# plotPerformances(0.7, 5, 1, 4, verbose=True, save=True)
+# Test méthode plotPerformances sur les algorithmes de branchement
+# plotPerformances(0.3, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 4, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 4, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
 
-# Test méthode plotPerformances sur l'algorithme de branchement 
-# plotPerformances(0.3, 5, 1, 5, verbose=True, save=True)
-# plotPerformances(0.7, 5, 1, 5, verbose=True, save=True)
+# Test méthode plotPerformances sur l
+# plotPerformances(0.3, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.5, 15, 2.5, 5, verbose=True, save=True)
+# plotPerformances(0.7, 15, 2.5, 5, verbose=True, save=True)
 # print("\n----------------------------------------------------------------------------------------\n")
 
 #------------------------------------------------------------------------------------------------------
@@ -1418,5 +1406,5 @@ def evaluationAlgorithm(n, p, a) :
 #------------------------------------------------------------------------------------------------------
 
 # Evalutation du rapport d'approximation (question 4.4.1)
-# plotRapportApproximation(10, 0.5, 10, 1, verbose = False, save = False)
+plotRapportApproximation(15, 0.5, 1, verbose = True, save = False)
 # print("\n----------------------------------------------------------------------------------------\n")
