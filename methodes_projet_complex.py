@@ -1413,3 +1413,17 @@ def evaluationAlgorithm(n, p, a) :
 # plotRapportApproximation(20, 0.5, 1, verbose = True, save = False) # algoCouplage
 # plotRapportApproximation(20, 0.5, 2, verbose = True, save = False) # algoGlouton
 # print("\n----------------------------------------------------------------------------------------\n")
+
+#------------------------------------------------------------------------------------------------------
+
+# Test général sur les méthodes de branchement
+#G = acquisitionGraphe("exempleinstance.txt")
+G = randomGraphe(5, 0.5)
+print("Solution algoCouplage :\t\t\t\t", algoCouplage(G))
+print("Solution algoGlouton :\t\t\t\t", algoGlouton(G))
+print("Solution branchement :\t\t\t\t", branchement(G, verbose = False))
+print("Solution branchementBornesCouplage :\t\t", branchementBornesCouplage(G, verbose = False))
+print("Solution branchementOptimiseCouplage :\t\t", branchementOptimiseCouplage(G, verbose = False))
+print("Solution branchementOptimiseCouplage_uDegreMax :", branchementOptimiseCouplage_uDegreMax(G, verbose = False))
+showGraphe(G)
+print("\n----------------------------------------------------------------------------------------\n")
